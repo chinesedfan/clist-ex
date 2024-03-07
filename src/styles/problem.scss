@@ -7,36 +7,8 @@
     border: 1px solid;
     border-radius: 50%;
     box-sizing: border-box;
-    &.blue {
-        border-color: blue;
-        background: linear-gradient(to top, blue 36%, white 36%);
-    }
 }
 .problem-cell {
     display: inline-block;
     vertical-align: middle;
-    &.grey {
-        color: gray;
-    }
-    &.green {
-        color: green;
-    }
-    &.cyan {
-        color: #03a89e;
-    }
-    &.blue {
-        color: blue;
-    }
-    &.violet {
-        color: #a0a;
-    }
-    &.yellow {
-        color: #bb0;
-    }
-    &.orange {
-        color: #ff8c00;
-    }
-    &.red {
-        color: red;
-    }
 }
