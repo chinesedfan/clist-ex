@@ -1,6 +1,8 @@
 import React from 'react';
 import { Table } from 'antd';
 import Problem from '../types/Problem';
+import { getRatingColor } from '../utils';
+import '../styles/problem.scss';
 
 const { Column } = Table;
 
@@ -9,22 +11,31 @@ interface Props {
 }
 export const ProblemList: React.FC<Props> = (props) => {
     const { problems } = props;
-    const contestMap: {[key: string]: {[key: string]: string}} = {};
+    const contestMap: {[key: string]: {[key: string]: Problem}} = {};
     problems.forEach(p => {
         const contest = p.url.split('/')[4];
         contestMap[contest] = contestMap[contest] || {
             contest,
         };
-        contestMap[contest][p.short || ''] = p.name || '';
+        contestMap[contest][p.short || ''] = p
     });
     const data = Object.keys(contestMap)
         .map(contest => contestMap[contest]);
 
     return <Table dataSource={data}>
         <Column title="Contest" dataIndex="contest" />
-        <Column title="Q1" dataIndex="Q1" />
-        <Column title="Q2" dataIndex="Q2" />
-        <Column title="Q3" dataIndex="Q3" />
-        <Column title="Q4" dataIndex="Q4" />
+        {
+            [1, 2, 3, 4].map(x => (
+                <Column title={"Q" + x} dataIndex={"Q" + x} render={(problem?: Problem) => {
+                    if (!problem) return null;
+
+                    const color = getRatingColor(problem.rating);
+                    return <>
+                        <span className={"difficult-circle " + color}></span>
+                        <span className={"problem-cell " + color}>{problem.name}</span>
+                    </>;
+                }} />
+            ))
+        }
     </Table>;
 };
