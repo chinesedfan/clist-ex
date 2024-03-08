@@ -46,7 +46,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                         <Tooltip title={"Rating: " + problem.rating}>
                             <span className="difficult-circle " style={circleStyle}></span>
                         </Tooltip>
-                        <span className="problem-cell" style={spanStyle}>{problem.name}</span>
+                        <a className="problem-cell" style={spanStyle} href={problem.url} target="_blank">{problem.name}</a>
                     </>;
                 }} />
             ))
