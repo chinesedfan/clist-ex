@@ -1,19 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './App.css';
-import Problem from './types/Problem';
-import { ProblemList } from './pages/ProblemList';
-import { getProblemList } from './apis';
+import { Card, Layout, Menu, theme } from 'antd';
+import { ProblemPage } from './pages/ProblemPage';
+
+const { Header, Content, Footer } = Layout
 
 function App() {
-    const [problems, setProblems] = useState<Problem[]>([]);
-    useEffect(() => {
-        getProblemList().then(setProblems);
-    }, [])
-    return (
-        <div className="App">
-            <ProblemList problems={problems} />
-        </div>
-    );
+    return <Layout style={{ minHeight: '100vh' }}>
+        <Header style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ padding: '0 20px', color: 'white', fontSize: 20, fontWeight: 'bold' }}>clist-ex</div>
+            <Menu
+                theme="dark"
+                mode="horizontal"
+                items={[
+                    { key: 'problems', label: 'Problems' },
+                    { key: 'github', label: 'Github' },
+                    { key: 'about', label: 'About' },
+                ]}
+                style={{ flex: 1, minWidth: 0 }}
+            />
+        </Header>
+        <Content style={{ padding: '30px 48px' }}>
+            <Card>
+                <ProblemPage></ProblemPage>
+            </Card>
+        </Content>
+        <Footer style={{ textAlign: 'center' }}>
+            clist-ex ©{new Date().getFullYear()} Created by <a href='https://github.com/chinesedfan' target='_blank'>chinesedfan</a>
+        </Footer>
+    </Layout>;
 }
 
 export default App;
