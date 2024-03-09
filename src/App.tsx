@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { Card, Layout, Menu, theme } from 'antd';
+import { Card, Layout, Menu } from 'antd';
 import { ProblemPage } from './pages/ProblemPage';
 
 const { Header, Content, Footer } = Layout
@@ -8,7 +8,7 @@ const { Header, Content, Footer } = Layout
 function App() {
     return <Layout style={{ minHeight: '100vh' }}>
         <Header style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ padding: '0 20px', color: 'white', fontSize: 20, fontWeight: 'bold' }}>clist-ex</div>
+            <div style={{ flex: 1, padding: '0 20px', color: 'white', fontSize: 20, fontWeight: 'bold' }}>clist-ex</div>
             <Menu
                 theme="dark"
                 mode="horizontal"
@@ -17,7 +17,6 @@ function App() {
                     { key: 'github', label: 'Github' },
                     { key: 'about', label: 'About' },
                 ]}
-                style={{ flex: 1, minWidth: 0 }}
             />
         </Header>
         <Content style={{ padding: '30px 48px' }}>
