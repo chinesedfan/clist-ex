@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Flex, Input, Radio, Row, Space, Tabs } from 'antd';
+import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import { getProblemList } from '../apis';
-import { ProblemList } from './ProblemList';
-import Problem from '../types/Problem';
+import { getAccountByHandle, getProblemList, getStatisticsByAccountId } from '../apis';
+import { ProblemItem, ProblemList } from './ProblemList';
 import { ProblemFilter } from '../components/ProblemFilter';
+import type Statistics from '../types/Statistics';
 
 const items: TabsProps['items'] = [
     {
@@ -33,17 +33,22 @@ const items: TabsProps['items'] = [
     },
 ];
 
-export const ProblemPage: React.FC<any> = (props) => {
-    const [problems, setProblems] = useState<Problem[]>([]);
+export const ProblemPage: React.FC = () => {
+    const [problems, setProblems] = useState<ProblemItem[]>([]);
+    const [statistics, setStatistics] = useState<Statistics[]>([]);
     useEffect(() => {
-        getProblemList()
-            .then(setProblems)
-            .catch(() => {});
+        (async function () {
+            const account = await getAccountByHandle('chinesedfan');
+            const statistics = await getStatisticsByAccountId(account.id);
+            const problems = await getProblemList();
+            setProblems(problems);
+            setStatistics(statistics);
+        })();
     }, [])
     return (
         <div>
             <Tabs items={items} style={{ marginBottom: '16px' }}></Tabs>
-            <ProblemList problems={problems} />
+            <ProblemList problems={problems} statistics={statistics} />
         </div>
     );
 }

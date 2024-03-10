@@ -9,15 +9,16 @@
     box-sizing: border-box;
 }
 .problem-cell {
-    &.solved {
-        background-color: #9ad59e;
-    }
-    &.upsolved {
-        background-color: #c3e6cb;
-    }
+    padding: 0 !important;
 
     .problem-content {
-        padding: 20px 0;
+        padding: 36px 16px;
+        &.solved {
+            background-color: #9ad59e;
+        }
+        &.upsolved {
+            background-color: #c3e6cb;
+        }
     }
     .problem-link {
         display: inline-block;

@@ -2,6 +2,8 @@ import axios from "axios";
 import { ListResponse } from "../types/Response";
 import Account from "../types/Account";
 import Problem from "../types/Problem";
+import Statistics from "../types/Statistics";
+import { notification } from "antd";
 
 const R_LC = 'leetcode.com';
 
@@ -10,6 +12,12 @@ const client = axios.create({
     headers: {
         Authorization: 'TODO://',
     },
+});
+client.interceptors.response.use(data => data, error => {
+    notification.error({
+        message: error.message,
+        description: error.stack,
+    });
 });
 
 export function getAccountByHandle(handle__regex: string, resource = R_LC) {
@@ -30,6 +38,19 @@ export function getProblemList(resource = R_LC) {
             resource,
             order_by: '-id',
             limit: 4 * 50,
+        },
+    }).then(res => {
+        const list = res.data.objects;
+        return list;
+    });
+}
+
+export function getStatisticsByAccountId(account_id: number) {
+    return client.get<ListResponse<Statistics>>('/statistics', {
+        params: {
+            account_id,
+            with_problems: 'true',
+            order_by: '-date',
         },
     }).then(res => {
         const list = res.data.objects;
