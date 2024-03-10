@@ -9,6 +9,34 @@
     box-sizing: border-box;
 }
 .problem-cell {
-    display: inline-block;
-    vertical-align: middle;
+    &.solved {
+        background-color: #9ad59e;
+    }
+    &.upsolved {
+        background-color: #c3e6cb;
+    }
+
+    .problem-content {
+        padding: 20px 0;
+    }
+    .problem-link {
+        display: inline-block;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .problem-statistics {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+    }
+    .problem-time {
+        color: #888;
+    }
+    .problem-penalty {
+        margin-left: 5px;
+        color: red;
+    }
 }

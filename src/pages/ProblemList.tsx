@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Tooltip } from 'antd';
+import { Flex, Table, Tooltip } from 'antd';
 import Problem from '../types/Problem';
 import { getRatingColor, getRatingPercent } from '../utils';
 import '../styles/problem.scss';
@@ -30,7 +30,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         <Column title="Contest" dataIndex="contest" />
         {
             [1, 2, 3, 4].map(x => (
-                <Column title={"Q" + x} dataIndex={"Q" + x} key={x} render={(problem?: Problem) => {
+                <Column className="problem-cell" ellipsis title={"Q" + x} dataIndex={"Q" + x} key={x} render={(problem?: Problem) => {
                     if (!problem) return null;
 
                     const color = getRatingColor(problem.rating);
@@ -43,10 +43,16 @@ export const ProblemList: React.FC<Props> = (props) => {
                         color,
                     };
                     return <>
-                        <Tooltip title={"Rating: " + problem.rating}>
-                            <span className="difficult-circle " style={circleStyle}></span>
-                        </Tooltip>
-                        <a className="problem-cell" style={spanStyle} href={problem.url} target="_blank">{problem.name}</a>
+                        <Flex className="problem-content" align="center">
+                            <Tooltip title={"Rating: " + problem.rating}>
+                                <span className="difficult-circle " style={circleStyle}></span>
+                            </Tooltip>
+                            <a className="problem-link" style={spanStyle} href={problem.url} target="_blank">{problem.name}</a>
+                        </Flex>
+                        <div className="problem-statistics">
+                            <span className="problem-time">10:30</span>
+                            <span className="problem-penalty">(+1)</span>
+                        </div>
                     </>;
                 }} />
             ))
