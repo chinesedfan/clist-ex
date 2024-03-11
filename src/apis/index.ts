@@ -12,12 +12,14 @@ const client = axios.create({
     headers: {
         Authorization: 'TODO://',
     },
+    timeout: 2000,
 });
 client.interceptors.response.use(data => data, error => {
     notification.error({
         message: error.message,
         description: error.stack,
     });
+    throw error;
 });
 
 export function getAccountByHandle(handle__regex: string, resource = R_LC) {
@@ -29,6 +31,8 @@ export function getAccountByHandle(handle__regex: string, resource = R_LC) {
     }).then(res => {
         const list = res.data.objects;
         return list[0];
+    }).catch(() => {
+        return null;
     });
 }
 
@@ -42,6 +46,8 @@ export function getProblemList(resource = R_LC) {
     }).then(res => {
         const list = res.data.objects;
         return list;
+    }).catch(() => {
+        return [];
     });
 }
 
@@ -55,5 +61,7 @@ export function getStatisticsByAccountId(account_id: number) {
     }).then(res => {
         const list = res.data.objects;
         return list;
+    }).catch(() => {
+        return [];
     });
 }

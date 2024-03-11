@@ -39,6 +39,8 @@ export const ProblemPage: React.FC = () => {
     useEffect(() => {
         (async function () {
             const account = await getAccountByHandle('chinesedfan');
+            if (!account) return;
+
             const statistics = await getStatisticsByAccountId(account.id);
             const problems = await getProblemList();
             setProblems(problems);
