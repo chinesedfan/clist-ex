@@ -1,9 +1,9 @@
 export default interface Problem {
-    id?: number;
-    name?: string;
-    contests_ids?: Array<number | string>;
-    resource?: string;
-    resource_id?: number;
+    id: number;
+    name: string;
+    contests_ids: Array<number | string>;
+    resource: string;
+    resource_id: number;
     slug: string;
     short: string;
     url: string;
@@ -16,10 +16,9 @@ export default interface Problem {
     rating: number;
     favorite: boolean;
     note: string | null;
-    system_solved?: boolean;
-    system_reject?: boolean;
-    user_solved?: boolean;
-    user_todo?: boolean;
-    user_reject?: boolean;
-    [key: string]: any;
+    system_solved: boolean;
+    system_reject: boolean;
+    user_solved: boolean;
+    user_todo: boolean;
+    user_reject: boolean;
 }

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import { getAccountByHandle, getProblemList, getStatisticsByAccountId } from '../apis';
-import { ProblemItem, ProblemList } from './ProblemList';
 import { ProblemFilter } from '../components/ProblemFilter';
+import { getAccountByHandle, getProblemList, getStatisticsByAccountId } from '../apis';
+import { ProblemList } from './ProblemList';
 import type Statistics from '../types/Statistics';
+import Problem from '../types/Problem';
 
 const items: TabsProps['items'] = [
     {
@@ -34,17 +35,18 @@ const items: TabsProps['items'] = [
 ];
 
 export const ProblemPage: React.FC = () => {
-    const [problems, setProblems] = useState<ProblemItem[]>([]);
+    const [problems, setProblems] = useState<Problem[]>([]);
     const [statistics, setStatistics] = useState<Statistics[]>([]);
     useEffect(() => {
         (async function () {
-            const account = await getAccountByHandle('chinesedfan');
-            if (!account) return;
-
-            const statistics = await getStatisticsByAccountId(account.id);
             const problems = await getProblemList();
             setProblems(problems);
-            setStatistics(statistics);
+
+            const account = await getAccountByHandle('chinesedfan');
+            if (account) {
+                const statistics = await getStatisticsByAccountId(account.id);
+                setStatistics(statistics);
+            }
         })();
     }, [])
     return (

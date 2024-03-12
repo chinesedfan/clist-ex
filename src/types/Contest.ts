@@ -13,7 +13,7 @@ export default interface Contest {
     href: string;
     problems: ContestProblem[];
 }
-interface ContestProblem {
+export interface ContestProblem {
     code: number;
     difficulty: 'easy' | 'medium' | 'hard';
     first_ac: {
