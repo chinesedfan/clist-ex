@@ -1,9 +1,10 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import { notification } from "antd";
 import { ListResponse } from "../types/Response";
 import Account from "../types/Account";
 import Problem from "../types/Problem";
 import Statistics from "../types/Statistics";
-import { notification } from "antd";
+import Contest from "../types/Contest";
 
 const R_LC = 'leetcode.com';
 
@@ -22,28 +23,16 @@ client.interceptors.response.use(data => data, error => {
     throw error;
 });
 
-export function getAccountByHandle(handle__regex: string, resource = R_LC) {
-    return client.get<ListResponse<Account>>('/account', {
-        params: {
-            resource,
-            handle__regex,
-        },
-    }).then(res => {
+function extractItem<T>(p: Promise<AxiosResponse<ListResponse<T>>>) {
+    return p.then(res => {
         const list = res.data.objects;
         return list[0];
     }).catch(() => {
         return null;
     });
 }
-
-export function getProblemList(resource = R_LC) {
-    return client.get<ListResponse<Problem>>('/problem', {
-        params: {
-            resource,
-            order_by: '-id',
-            limit: 4 * 50,
-        },
-    }).then(res => {
+function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>>>) {
+    return p.then(res => {
         const list = res.data.objects;
         return list;
     }).catch(() => {
@@ -51,17 +40,41 @@ export function getProblemList(resource = R_LC) {
     });
 }
 
+export function getAccountByHandle(handle__regex: string, resource = R_LC) {
+    return extractItem(client.get<ListResponse<Account>>('/account', {
+        params: {
+            resource,
+            handle__regex,
+        },
+    }));
+}
+
+export function getContestList(resource = R_LC) {
+    return extractList(client.get<ListResponse<Contest>>('/contest', {
+        params: {
+            resource,
+            order_by: 'id',
+            with_problems: 'true',
+        },
+    }));
+}
+
+export function getProblemList(resource = R_LC) {
+    return extractList(client.get<ListResponse<Problem>>('/problem', {
+        params: {
+            resource,
+            order_by: '-id',
+            limit: 4 * 50,
+        },
+    }));
+}
+
 export function getStatisticsByAccountId(account_id: number) {
-    return client.get<ListResponse<Statistics>>('/statistics', {
+    return extractList(client.get<ListResponse<Statistics>>('/statistics', {
         params: {
             account_id,
             with_problems: 'true',
             order_by: '-date',
         },
-    }).then(res => {
-        const list = res.data.objects;
-        return list;
-    }).catch(() => {
-        return [];
-    });
+    }));
 }

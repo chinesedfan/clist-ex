@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Flex, Table, Tooltip } from 'antd';
 import Problem from '../types/Problem';
-import Statistics, { StatisticsProblem, isUpsolved } from '../types/Statistics';
+import Statistics, { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils';
 import { getEventByUrl } from '../utils/contest';
 import '../styles/problem.scss';
@@ -9,7 +9,7 @@ import '../styles/problem.scss';
 const { Column } = Table;
 
 export type ProblemItem = Problem & {
-    statistics?: StatisticsProblem 
+    statistics?: StatisticsResult 
 }
 interface Props {
     problems: ProblemItem[];
@@ -46,7 +46,7 @@ export const ProblemList: React.FC<Props> = (props) => {
     const contentClassName = useCallback((problem?: ProblemItem) => {
         if (!problem || !problem.statistics) return '';
 
-        if (isUpsolved(problem.statistics)) {
+        if (isUpsolvingResult(problem.statistics)) {
             return 'upsolved';
         } else {
             return 'solved';
@@ -64,10 +64,10 @@ export const ProblemList: React.FC<Props> = (props) => {
         const spanStyle = {
             color,
         };
-        const problemTime = isUpsolved(problem.statistics)
+        const problemTime = isUpsolvingResult(problem.statistics)
             ? ''
             : problem.statistics?.time
-        const problemPenalty = isUpsolved(problem.statistics)
+        const problemPenalty = isUpsolvingResult(problem.statistics)
             ? ''
             : problem.statistics?.result
         return <>
@@ -80,7 +80,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             { !!problem.statistics && 
                 <div className="problem-statistics">
                     <span className="problem-time">{problemTime}</span>
-                    { problemPenalty && problemPenalty != '+' &&
+                    { problemPenalty && problemPenalty !== '+' &&
                         <span className="problem-penalty">({problemPenalty})</span>
                     }
                 </div>

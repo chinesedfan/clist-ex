@@ -10,19 +10,19 @@ export default interface Statistics {
     new_rating: number;
     old_rating: number;
     rating_change: number;
-    problems: Record<string, StatisticsProblem>;
+    problems: Record<string, StatisticsResult>;
     more_fields: Record<string, any>;
 }
 
-export type StatisticsProblem = ContestProblem | { 
-    upsolving: UpsolvingProblem;
+export type StatisticsResult = ProblemResult | { 
+    upsolving: UpsolvingResult;
 }
-export function isUpsolved(problem: any): problem is { 
-    upsolving: UpsolvingProblem;
+export function isUpsolvingResult(result: any): result is { 
+    upsolving: UpsolvingResult;
 } {
-    return problem && problem.upsolving
+    return result && result.upsolving
 }
-export interface ContestProblem {
+export interface ProblemResult {
     data_region: string;
     language: string;
     result: string;
@@ -30,7 +30,7 @@ export interface ContestProblem {
     time: string;
     time_in_seconds: number;
 }
-export interface UpsolvingProblem {
+export interface UpsolvingResult {
     binary: boolean;
     result: string;
     submission_id: number;
