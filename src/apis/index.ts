@@ -6,7 +6,8 @@ import Problem from "../types/Problem";
 import Statistics from "../types/Statistics";
 import Contest from "../types/Contest";
 
-const R_LC = 'leetcode.com';
+export const R_LC = 'leetcode.com';
+export const R_CC = 'codechef.com';
 
 const client = axios.create({
     baseURL: 'https://clist.by/api/v4',
@@ -41,7 +42,7 @@ function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>>>) {
 }
 
 export function getAccountByHandle(handle__regex: string, resource = R_LC) {
-    return extractItem(client.get<ListResponse<Account>>('/account', {
+    return extractItem(client.get<ListResponse<Account>>('/account/', {
         params: {
             resource,
             handle__regex,
@@ -50,7 +51,7 @@ export function getAccountByHandle(handle__regex: string, resource = R_LC) {
 }
 
 export function getContestList(resource = R_LC) {
-    return extractList(client.get<ListResponse<Contest>>('/contest', {
+    return extractList(client.get<ListResponse<Contest>>('/contest/', {
         params: {
             resource,
             with_problems: 'true',
@@ -60,16 +61,17 @@ export function getContestList(resource = R_LC) {
 }
 
 export function getProblemList(resource = R_LC) {
-    return extractList(client.get<ListResponse<Problem>>('/problem', {
+    return extractList(client.get<ListResponse<Problem>>('/problem/', {
         params: {
             resource,
             order_by: '-id',
+            limit: 50,
         },
     }));
 }
 
 export function getStatisticsByAccountId(account_id: number) {
-    return extractList(client.get<ListResponse<Statistics>>('/statistics', {
+    return extractList(client.get<ListResponse<Statistics>>('/statistics/', {
         params: {
             account_id,
             with_problems: 'true',

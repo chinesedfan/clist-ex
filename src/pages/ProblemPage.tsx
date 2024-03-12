@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Tabs } from 'antd';
 import type { RadioChangeEvent, TabsProps } from 'antd';
 import { ProblemFilter } from '../components/ProblemFilter';
-import { getAccountByHandle, getProblemList, getStatisticsByAccountId } from '../apis';
+import { R_CC, R_LC, getAccountByHandle, getProblemList, getStatisticsByAccountId } from '../apis';
 import { ProblemList } from './ProblemList';
 import type Statistics from '../types/Statistics';
 import Problem from '../types/Problem';
@@ -11,7 +11,7 @@ import { getEventByUrl } from '../utils/contest';
 
 const items: TabsProps['items'] = [
     {
-        key: 'lc',
+        key: R_LC,
         label: 'LeetCode',
         children: (
             <ProblemFilter radios={[
@@ -22,7 +22,7 @@ const items: TabsProps['items'] = [
         ),
     },
     {
-        key: 'cc',
+        key: R_CC,
         label: 'CodeChef',
         children: (
             <ProblemFilter radios={[
@@ -37,14 +37,15 @@ const items: TabsProps['items'] = [
 ];
 
 export const ProblemPage: React.FC = () => {
+    const [resource, setResource] = useState<string>(R_LC);
     const [problems, setProblems] = useState<Problem[]>([]);
     const [showProblems, setShowProblems] = useState<Problem[]>([]);
     const [statistics, setStatistics] = useState<Statistics[]>([]);
     useEffect(() => {
         (async function () {
-            const problems = await getProblemList();
+            const problems = await getProblemList(resource);
             setProblems(problems);
-            setShowProblems(showProblems);
+            setShowProblems(problems);
 
             const account = await getAccountByHandle('chinesedfan');
             if (account) {
@@ -52,7 +53,7 @@ export const ProblemPage: React.FC = () => {
                 setStatistics(statistics);
             }
         })();
-    }, []);
+    }, [resource]);
     const contextValue = useMemo(() => ({
         onSearch: () => {},
         onRadioChange: (e: RadioChangeEvent) => {
@@ -69,7 +70,7 @@ export const ProblemPage: React.FC = () => {
     return (
         <div>
             <ProblemFilterContext.Provider value={contextValue}>
-                <Tabs items={items} style={{ marginBottom: '16px' }}></Tabs>
+                <Tabs items={items} onChange={setResource} style={{ marginBottom: '16px' }}></Tabs>
             </ProblemFilterContext.Provider>
             <ProblemList problems={showProblems} statistics={statistics} />
         </div>
