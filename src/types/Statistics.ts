@@ -25,7 +25,7 @@ export function isUpsolved(problem: any): problem is {
 export interface ContestProblem {
     data_region: string;
     language: string;
-    result: "+",
+    result: string;
     submission_id: number;
     time: string;
     time_in_seconds: number;
