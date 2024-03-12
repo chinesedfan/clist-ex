@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Col, Input, Radio, Row } from 'antd';
+import { ProblemFilterContext } from './ProblemFilterContext';
 
 const { Search } = Input;
 
@@ -10,15 +11,16 @@ interface RadioItem {
 interface Props {
     radios: RadioItem[];
 }
-export const ProblemFilter: React.FC<Props> = props => (
-    <Row justify="space-between">
+export const ProblemFilter: React.FC<Props> = props => {
+    const { onRadioChange, onSearch } = useContext(ProblemFilterContext);
+    return (<Row justify="space-between">
         <Col span={4}>
-            <Search placeholder='handle'></Search>
+            <Search placeholder="handle" onSearch={onSearch}></Search>
         </Col>
-        <Radio.Group defaultValue={0}>
+        <Radio.Group defaultValue={0} onChange={onRadioChange}>
             { props.radios.map(item => (
                 <Radio.Button value={item.value} key={item.value}>{item.label}</Radio.Button>
             ))}
         </Radio.Group>
-    </Row>
-);
+    </Row>);
+}

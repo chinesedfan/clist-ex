@@ -53,8 +53,8 @@ export function getContestList(resource = R_LC) {
     return extractList(client.get<ListResponse<Contest>>('/contest', {
         params: {
             resource,
-            order_by: 'id',
             with_problems: 'true',
+            order_by: 'id',
         },
     }));
 }
@@ -64,7 +64,6 @@ export function getProblemList(resource = R_LC) {
         params: {
             resource,
             order_by: '-id',
-            limit: 4 * 50,
         },
     }));
 }

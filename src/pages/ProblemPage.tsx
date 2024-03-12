@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Tabs } from 'antd';
-import type { TabsProps } from 'antd';
+import type { RadioChangeEvent, TabsProps } from 'antd';
 import { ProblemFilter } from '../components/ProblemFilter';
 import { getAccountByHandle, getProblemList, getStatisticsByAccountId } from '../apis';
 import { ProblemList } from './ProblemList';
 import type Statistics from '../types/Statistics';
 import Problem from '../types/Problem';
+import { ProblemFilterContext } from '../components/ProblemFilterContext';
+import { getEventByUrl } from '../utils/contest';
 
 const items: TabsProps['items'] = [
     {
@@ -14,8 +16,8 @@ const items: TabsProps['items'] = [
         children: (
             <ProblemFilter radios={[
                 { label: 'All', value: 0 },
-                { label: 'Weekly', value: 1 },
-                { label: 'Biweekly', value: 2 },
+                { label: 'Weekly', value: 'Weekly' },
+                { label: 'Biweekly', value: 'Biweekly' },
             ]}></ProblemFilter>        
         ),
     },
@@ -36,11 +38,13 @@ const items: TabsProps['items'] = [
 
 export const ProblemPage: React.FC = () => {
     const [problems, setProblems] = useState<Problem[]>([]);
+    const [showProblems, setShowProblems] = useState<Problem[]>([]);
     const [statistics, setStatistics] = useState<Statistics[]>([]);
     useEffect(() => {
         (async function () {
             const problems = await getProblemList();
             setProblems(problems);
+            setShowProblems(showProblems);
 
             const account = await getAccountByHandle('chinesedfan');
             if (account) {
@@ -48,11 +52,26 @@ export const ProblemPage: React.FC = () => {
                 setStatistics(statistics);
             }
         })();
-    }, [])
+    }, []);
+    const contextValue = useMemo(() => ({
+        onSearch: () => {},
+        onRadioChange: (e: RadioChangeEvent) => {
+            const keyword = e.target.value;
+            if (keyword) {
+                setShowProblems(problems.filter(p => {
+                    return getEventByUrl(p.url).indexOf(keyword) >= 0;
+                }));
+            } else {
+                setShowProblems(problems);
+            }
+        },
+    }), [problems]);
     return (
         <div>
-            <Tabs items={items} style={{ marginBottom: '16px' }}></Tabs>
-            <ProblemList problems={problems} statistics={statistics} />
+            <ProblemFilterContext.Provider value={contextValue}>
+                <Tabs items={items} style={{ marginBottom: '16px' }}></Tabs>
+            </ProblemFilterContext.Provider>
+            <ProblemList problems={showProblems} statistics={statistics} />
         </div>
     );
 }
