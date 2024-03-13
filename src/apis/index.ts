@@ -76,10 +76,11 @@ export function getProblemList(resource: string) {
     }));
 }
 
-export function getStatisticsByAccountId(account_id: number) {
+export function getStatisticsByAccountId(account_id: number, contestIds: number[]) {
     return extractList(client.get<ListResponse<Statistics>>('/statistics/', {
         params: {
             account_id,
+            contest_id__in: contestIds.join(','),
             with_problems: 'true',
             order_by: '-date',
         },

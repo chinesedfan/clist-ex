@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Flex, Table, TablePaginationConfig, Tooltip } from 'antd';
-import Statistics, { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
+import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils';
 import '../styles/problem.scss';
 import { getAccountByHandle, getContestList, getStatisticsByAccountId } from '../apis';
 import { ContestProblem } from '../types/Contest';
+import Account from '../types/Account';
 
 const { Column } = Table;
 
@@ -30,57 +31,84 @@ interface ProblemItem {
 
 export const ProblemList: React.FC<Props> = (props) => {
     const { resource, handle, eventKeyword } = props;
-    const [data, setData] = useState<RowData[]>();
+    const [account, setAccount] = useState<Account>();
+    const [contestMap, setContestMap] = useState<Record<string, RowData>>({});
+    const [contestIds, setContestIds] = useState<number[]>([]);
     const [pagination, setPagination] = useState<TablePaginationConfig>({
         current: 1,
         pageSize: 10,
     });
+    async function loadContestList(currentPage: number) {
+        const res = await getContestList(resource, eventKeyword, currentPage - 1);
+        if (!res) return;
+
+        const { meta, objects } = res.data;
+        setPagination({
+            ...pagination,
+            current: currentPage,
+            total: meta.total_count,
+        });
+
+        const contestIds: number[] = [];
+        const contestMap = objects.reduce((o, c) => {
+            if (!c.problems) return o;
+
+            contestIds.push(c.id);
+            o[c.event] = c.problems.reduce((rowData, p) => {
+                rowData[p.short] = {
+                    problem: p,
+                }
+                return rowData;
+            }, {
+                contest: {
+                    event: c.event,
+                },
+            } as RowData);
+            return o;
+        }, {} as Record<string, RowData>)
+        setContestIds(contestIds);
+        setContestMap(contestMap);
+    }
     useEffect(() => {
-        (async function () {
-            const res = await getContestList(resource, eventKeyword, pagination.current! - 1);
-            if (!res) return;
+        loadContestList(1);
+    }, [resource, eventKeyword]);
+    useEffect(() => {
+        (async function loadAccount() {
+            if (!handle) return;
+    
+            const account = await getAccountByHandle(resource, handle);
+            if (!account) return;
 
-            const { meta, objects } = res.data;
-            setPagination({
-                ...pagination,
-                total: meta.total_count,
-            });
-
-            const contestMap = objects.reduce((o, c) => {
-                if (!c.problems) return o;
-
-                o[c.event] = c.problems.reduce((rowData, p) => {
-                    rowData[p.short] = {
-                        problem: p,
-                    }
-                    return rowData;
-                }, {
-                    contest: {
-                        event: c.event,
-                    },
-                } as RowData);
-                return o;
-            }, {} as Record<string, RowData>)
-
-            // const account = await getAccountByHandle(resource, handle);
-            // if (account) {
-            //     const statistics = await getStatisticsByAccountId(account.id);
-            //     for (const s of statistics) {
-            //         if (!contestMap[s.event]) continue;
-
-            //         for (const title in s.problems) {
-            //             const item = contestMap[s.event][title]
-            //             item.result = s.problems[title];
-            //         }
-            //     }
-            // }
-            const data = Object.keys(contestMap).map(key => contestMap[key]);
-            setData(data);
+            setAccount(account);
         })();
-    }, [props, pagination]);
+    }, [resource, handle]);
+    useEffect(() => {
+        (async function loadStatistics() {
+            if (!account || !contestIds.length) return;
+    
+            const statistics = await getStatisticsByAccountId(account.id, contestIds);
+            const newContestMap = { ...contestMap };
+            for (const s of statistics) {
+                if (!newContestMap[s.event]) continue;
+    
+                const contestItem = newContestMap[s.event].contest;
+                contestItem.place = s.place;
+                contestItem.new_rating = s.new_rating;
+                contestItem.rating_change = s.rating_change;
+                for (const title in s.problems) {
+                    const problemItem = newContestMap[s.event][title]
+                    problemItem.result = s.problems[title];
+                }
+            }
+            setContestMap(newContestMap);
+        })();
+    }, [account, contestIds, contestMap]);
     const onTableChange = useCallback((pagination: TablePaginationConfig) => {
-        setPagination(pagination);
-    }, []);
+        (async function() {
+            await loadContestList(pagination.current!);
+            setPagination(pagination);
+        })();
+    }, [resource, eventKeyword]);
     const contentClassName = useCallback((item?: ProblemItem) => {
         if (!item || !item.result) return '';
 
@@ -128,7 +156,12 @@ export const ProblemList: React.FC<Props> = (props) => {
         </>;
     }, []);
 
-    return <Table dataSource={data} pagination={pagination} onChange={onTableChange} rowKey={(rowData) => rowData.contest.event}>
+    return <Table
+        dataSource={Object.keys(contestMap).map(key => contestMap[key])}
+        rowKey={(rowData) => rowData.contest.event}
+        pagination={pagination} 
+        onChange={onTableChange} 
+    >
         <Column title="Contest" dataIndex="contest" render={contestItemRender} />
         {
             ['Q1', 'Q2', 'Q3', 'Q4'].map(title => (
