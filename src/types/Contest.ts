@@ -11,7 +11,7 @@ export default interface Contest {
     parsed_at: string;
     duration: string;
     href: string;
-    problems: ContestProblem[];
+    problems?: ContestProblem[];
 }
 export interface ContestProblem {
     code: number;

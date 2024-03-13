@@ -12,7 +12,7 @@ export const R_CC = 'codechef.com';
 const client = axios.create({
     baseURL: 'https://clist.by/api/v4',
     headers: {
-        Authorization: 'TODO://',
+        Authorization: process.env.REACT_APP_CLIST_API_AUTH,
     },
     timeout: 2000,
 });
@@ -41,7 +41,7 @@ function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>>>) {
     });
 }
 
-export function getAccountByHandle(handle__regex: string, resource = R_LC) {
+export function getAccountByHandle(resource: string, handle__regex: string) {
     return extractItem(client.get<ListResponse<Account>>('/account/', {
         params: {
             resource,
@@ -50,17 +50,23 @@ export function getAccountByHandle(handle__regex: string, resource = R_LC) {
     }));
 }
 
-export function getContestList(resource = R_LC) {
-    return extractList(client.get<ListResponse<Contest>>('/contest/', {
+export function getContestList(resource: string, event__regex: string, page = 0) {
+    return client.get<ListResponse<Contest>>('/contest/', {
         params: {
+            limit: 10,
+            offset: page * 10,
             resource,
+            event__regex, 
+            total_count: 'true',
             with_problems: 'true',
-            order_by: 'id',
+            order_by: '-start',
         },
-    }));
+    }).catch(() => {
+        return null;
+    });
 }
 
-export function getProblemList(resource = R_LC) {
+export function getProblemList(resource: string) {
     return extractList(client.get<ListResponse<Problem>>('/problem/', {
         params: {
             resource,

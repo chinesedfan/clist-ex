@@ -1,13 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Tabs } from 'antd';
 import type { RadioChangeEvent, TabsProps } from 'antd';
+import { R_CC, R_LC } from '../apis';
 import { ProblemFilter } from '../components/ProblemFilter';
-import { R_CC, R_LC, getAccountByHandle, getProblemList, getStatisticsByAccountId } from '../apis';
-import { ProblemList } from './ProblemList';
-import type Statistics from '../types/Statistics';
-import Problem from '../types/Problem';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
-import { getEventByUrl } from '../utils/contest';
+import { ProblemList } from './ProblemList';
 
 const items: TabsProps['items'] = [
     {
@@ -38,41 +35,22 @@ const items: TabsProps['items'] = [
 
 export const ProblemPage: React.FC = () => {
     const [resource, setResource] = useState<string>(R_LC);
-    const [problems, setProblems] = useState<Problem[]>([]);
-    const [showProblems, setShowProblems] = useState<Problem[]>([]);
-    const [statistics, setStatistics] = useState<Statistics[]>([]);
-    useEffect(() => {
-        (async function () {
-            const problems = await getProblemList(resource);
-            setProblems(problems);
-            setShowProblems(problems);
-
-            const account = await getAccountByHandle('chinesedfan');
-            if (account) {
-                const statistics = await getStatisticsByAccountId(account.id);
-                setStatistics(statistics);
-            }
-        })();
-    }, [resource]);
+    const [handle, setHandle] = useState<string>('');
+    const [eventKeyword, setEventKeyword] = useState<string>('');
     const contextValue = useMemo(() => ({
-        onSearch: () => {},
-        onRadioChange: (e: RadioChangeEvent) => {
-            const keyword = e.target.value;
-            if (keyword) {
-                setShowProblems(problems.filter(p => {
-                    return getEventByUrl(p.url).indexOf(keyword) >= 0;
-                }));
-            } else {
-                setShowProblems(problems);
-            }
+        onSearch: (handle: string) => {
+            setHandle(handle);
         },
-    }), [problems]);
+        onRadioChange: (e: RadioChangeEvent) => {
+            setEventKeyword(e.target.value);
+        },
+    }), []);
     return (
         <div>
             <ProblemFilterContext.Provider value={contextValue}>
                 <Tabs items={items} onChange={setResource} style={{ marginBottom: '16px' }}></Tabs>
             </ProblemFilterContext.Provider>
-            <ProblemList problems={showProblems} statistics={statistics} />
+            <ProblemList resource={resource} handle={handle} eventKeyword={eventKeyword} />
         </div>
     );
 }
