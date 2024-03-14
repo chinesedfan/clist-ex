@@ -86,7 +86,8 @@ export const ProblemList: React.FC<Props> = (props) => {
                 }
                 let index = 0;
                 for (const short in problemMap) {
-                    o[c.event]['Q' + (++index)] = {
+                    // copy to `short` as key
+                    o[c.event]['Q' + (++index)] = o[c.event][short] = {
                         problem: problemMap[short],
                     };
                 }
@@ -132,7 +133,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             }
             setContestMap(newContestMap);
         })();
-    }, [account, contestIds, contestMap]);
+    }, [account, contestIds]);
     const onTableChange = useCallback((pagination: TablePaginationConfig) => {
         (async function() {
             await loadContestList(pagination.current!);

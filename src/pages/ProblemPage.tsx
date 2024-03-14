@@ -24,10 +24,10 @@ const items: TabsProps['items'] = [
         children: (
             <ProblemFilter radios={[
                 { label: 'All', value: 0 },
-                { label: 'Rated for All', value: 1 },
-                { label: 'Rated till 6-stars', value: 2 },
-                { label: 'Rated till 5-stars', value: 3 },
-                { label: 'Rated for Divs 2, 3 & 4', value: 4 },
+                { label: 'Rated for All', value: 'All' },
+                { label: 'Rated till 6-stars', value: '6-stars' },
+                { label: 'Rated till 5-stars', value: '5-stars' },
+                { label: 'Rated for Divs 2, 3 & 4', value: 'Divs 2' },
             ]}></ProblemFilter>        
         ),
     },
