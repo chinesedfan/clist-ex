@@ -164,6 +164,11 @@ export const ProblemList: React.FC<Props> = (props) => {
         const spanStyle = {
             color,
         };
+        if (color === 'black') {
+            circleStyle.borderColor = 'red';
+            circleStyle.background = 'none';
+            spanStyle.color = 'red';
+        }
         const problemTime = isUpsolvingResult(result)
             ? ''
             : result?.time
@@ -176,9 +181,9 @@ export const ProblemList: React.FC<Props> = (props) => {
         return <>
             <Flex className={'problem-content ' + contentClassName(item)} align="center">
                 <Tooltip title={"Rating: " + problem.rating}>
-                    <span className="difficult-circle " style={circleStyle}></span>
+                    <span className={'difficult-circle ' + color} style={circleStyle}></span>
                 </Tooltip>
-                <a className="problem-link" style={spanStyle} href={problem.url} target="_blank">{problem.name}</a>
+                <a className="problem-link" style={spanStyle} href={problem.url} target="_blank">{isCCContestProblem(problem) ? problem.short : problem.name}</a>
             </Flex>
             { !!result && 
                 <div className="problem-statistics">
