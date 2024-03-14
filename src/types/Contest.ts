@@ -54,3 +54,7 @@ export interface CCContestProblem extends ContestProblem {
     // parsed from Contest
     divisions?: CCDiv[];
 }
+
+export function isCCContestProblem(problem: any): problem is CCContestProblem {
+    return problem.divisions;
+}

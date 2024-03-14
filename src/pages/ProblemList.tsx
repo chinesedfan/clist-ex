@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Flex, Table, TablePaginationConfig, Tooltip } from 'antd';
+import { Flex, Table, TablePaginationConfig, Tag, Tooltip } from 'antd';
 import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils';
 import '../styles/problem.scss';
 import { R_CC, R_LC, getAccountByHandle, getContestList, getStatisticsByAccountId } from '../apis';
-import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, LCContestProblem } from '../types/Contest';
+import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, LCContestProblem, isCCContestProblem } from '../types/Contest';
 import Account from '../types/Account';
 
 const { Column } = Table;
@@ -81,7 +81,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                             problemMap[p.short] = p;
                             p.divisions = []
                         }
-                        problemMap[p.short].divisions!.push(div as CCDiv);
+                        problemMap[p.short].divisions!.unshift(div as CCDiv);
                     }
                 }
                 let index = 0;
@@ -170,6 +170,9 @@ export const ProblemList: React.FC<Props> = (props) => {
         const problemPenalty = isUpsolvingResult(result)
             ? ''
             : result?.result
+        const problemDivisions = isCCContestProblem(problem)
+            ? problem.divisions!.reduce((s, x) => (s | (1 << +x[4])), 0)
+            : 0;
         return <>
             <Flex className={'problem-content ' + contentClassName(item)} align="center">
                 <Tooltip title={"Rating: " + problem.rating}>
@@ -183,6 +186,14 @@ export const ProblemList: React.FC<Props> = (props) => {
                     { problemPenalty && problemPenalty !== '+' &&
                         <span className="problem-penalty">({problemPenalty})</span>
                     }
+                </div>
+            }
+            { !!problemDivisions &&
+                <div className="problem-divisions">
+                    { [1, 2, 3, 4].map(x => {
+                        const visibility = (problemDivisions & (1 << x)) ? 'visible' : 'hidden';
+                        return <div className={'problem-div-' + x } key={x} style={{ visibility }}></div>;
+                    }) }
                 </div>
             }
         </>;
