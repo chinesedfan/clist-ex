@@ -3,8 +3,8 @@ import { Flex, Table, TablePaginationConfig, Tooltip } from 'antd';
 import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils';
 import '../styles/problem.scss';
-import { getAccountByHandle, getContestList, getStatisticsByAccountId } from '../apis';
-import { ContestProblem } from '../types/Contest';
+import { R_CC, R_LC, getAccountByHandle, getContestList, getStatisticsByAccountId } from '../apis';
+import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, LCContestProblem } from '../types/Contest';
 import Account from '../types/Account';
 
 const { Column } = Table;
@@ -20,6 +20,7 @@ type RowData = {
 
 interface ContestItem {
     event: string;
+    // parsed from Statistics
     place?: number;
     new_rating?: number;
     rating_change?: number;
@@ -31,6 +32,7 @@ interface ProblemItem {
 
 export const ProblemList: React.FC<Props> = (props) => {
     const { resource, handle, eventKeyword } = props;
+    const [maxProblemCount, setMaxProblemCount] = useState<number>(4);
     const [account, setAccount] = useState<Account>();
     const [contestMap, setContestMap] = useState<Record<string, RowData>>({});
     const [contestIds, setContestIds] = useState<number[]>([]);
@@ -49,23 +51,51 @@ export const ProblemList: React.FC<Props> = (props) => {
             total: meta.total_count,
         });
 
+        let maxProblemCount = 4;
         const contestIds: number[] = [];
         const contestMap = objects.reduce((o, c) => {
             if (!c.problems) return o;
 
             contestIds.push(c.id);
-            o[c.event] = c.problems.reduce((rowData, p) => {
-                rowData[p.short] = {
-                    problem: p,
-                }
-                return rowData;
-            }, {
+            o[c.event] = {
                 contest: {
                     event: c.event,
                 },
-            } as RowData);
+            } as RowData; 
+
+            if (resource === R_LC) {
+                (c as LCContest).problems!.reduce((rowData, p) => {
+                    rowData[p.short] = {
+                        problem: p,
+                    }
+                    return rowData;
+                }, o[c.event]);
+            } else if (resource === R_CC) {
+                const { division, divisions_order} = (c as CCContest).problems!;
+                const problemMap: Record<string, CCContestProblem> = {};
+                // reverse
+                divisions_order.reverse();
+                for (const div of divisions_order) {
+                    for (const p of division[div as CCDiv]) {
+                        if (!problemMap[p.short]) {
+                            problemMap[p.short] = p;
+                            p.divisions = []
+                        }
+                        problemMap[p.short].divisions!.push(div as CCDiv);
+                    }
+                }
+                let index = 0;
+                for (const short in problemMap) {
+                    o[c.event]['Q' + (++index)] = {
+                        problem: problemMap[short],
+                    };
+                }
+                maxProblemCount = Math.max(maxProblemCount, index);
+            }
+            
             return o;
         }, {} as Record<string, RowData>)
+        setMaxProblemCount(maxProblemCount);
         setContestIds(contestIds);
         setContestMap(contestMap);
     }
@@ -121,8 +151,10 @@ export const ProblemList: React.FC<Props> = (props) => {
     const contestItemRender = useCallback((item: ContestItem) => {
         return item.event;
     }, [])
-    const problemItemRender = useCallback((item: ProblemItem) => {
-        const problem = item.problem;
+    const problemItemRender = useCallback((item?: ProblemItem) => {
+        if (!item) return null;
+
+        const { problem, result } = item;
         const color = getRatingColor(problem.rating);
         const percent = getRatingPercent(problem.rating);
         const circleStyle = {
@@ -132,12 +164,12 @@ export const ProblemList: React.FC<Props> = (props) => {
         const spanStyle = {
             color,
         };
-        const problemTime = isUpsolvingResult(item.result)
+        const problemTime = isUpsolvingResult(result)
             ? ''
-            : item.result?.time
-        const problemPenalty = isUpsolvingResult(item.result)
+            : result?.time
+        const problemPenalty = isUpsolvingResult(result)
             ? ''
-            : item.result?.result
+            : result?.result
         return <>
             <Flex className={'problem-content ' + contentClassName(item)} align="center">
                 <Tooltip title={"Rating: " + problem.rating}>
@@ -145,7 +177,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                 </Tooltip>
                 <a className="problem-link" style={spanStyle} href={problem.url} target="_blank">{problem.name}</a>
             </Flex>
-            { !!item.result && 
+            { !!result && 
                 <div className="problem-statistics">
                     <span className="problem-time">{problemTime}</span>
                     { problemPenalty && problemPenalty !== '+' &&
@@ -164,10 +196,13 @@ export const ProblemList: React.FC<Props> = (props) => {
     >
         <Column title="Contest" dataIndex="contest" render={contestItemRender} />
         {
-            ['Q1', 'Q2', 'Q3', 'Q4'].map(title => (
-                <Column className="problem-cell" ellipsis
-                    title={title} dataIndex={title} key={title} render={problemItemRender} />
-            ))
+            Array(maxProblemCount)
+                .fill(0)
+                .map((_, index) => {
+                    const title = 'Q' + (index + 1);
+                    return <Column className="problem-cell" ellipsis
+                        title={title} dataIndex={title} key={title} render={problemItemRender} />
+                })
         }
     </Table>;
 };

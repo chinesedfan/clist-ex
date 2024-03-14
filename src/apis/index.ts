@@ -51,12 +51,13 @@ export function getAccountByHandle(resource: string, handle__regex: string) {
 }
 
 export function getContestList(resource: string, event__regex: string, page = 0) {
-    return client.get<ListResponse<Contest>>('/contest/', {
+    return client.get<ListResponse<Contest<any>>>('/contest/', {
         params: {
             limit: 10,
             offset: page * 10,
             resource,
             event__regex, 
+            upcoming: 'false',
             total_count: 'true',
             with_problems: 'true',
             order_by: '-start',
