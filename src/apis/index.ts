@@ -14,7 +14,7 @@ const client = axios.create({
     headers: {
         Authorization: process.env.REACT_APP_CLIST_API_AUTH,
     },
-    timeout: 4000,
+    timeout: 5000,
 });
 client.interceptors.response.use(data => data, (error: AxiosError) => {
     let message = error.message;
@@ -62,7 +62,7 @@ interface PaginationParams {
 }
 export interface GetContestListParams extends PaginationParams {
     resource: string;
-    event_regex?: string;
+    event__regex?: string;
     upcoming?: BoolString;
     total_count?: BoolString;
     with_problems?: BoolString;
@@ -78,11 +78,13 @@ async function getRawContestList(params: GetContestListParams) {
     }
 }
 
-export async function getContestTotalCount(resource: string) {
+export async function getContestTotalCount(resource: string, event__regex?: string) {
     const res = await getRawContestList({
         resource,
         limit: 1,
         total_count: 'true',
+        event__regex,
+        upcoming: 'false',
     });
     return res?.data.meta.total_count;
 }

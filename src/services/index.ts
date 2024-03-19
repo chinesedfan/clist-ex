@@ -45,28 +45,35 @@ export async function loadContestList(resource: string) {
     let storeName = STORE_LC;
     if (resource === R_CC) {
         storeName = STORE_CC;
-        params.event_regex = 'Starter';
+        // bad regex makes api returns slower
+        params.event__regex = '^(CodeChef )?Starters';
     }
 
     let cacheContests = await loadAllData<Contest<any>[]>(db, storeName);
-    cacheContests.sort((a, b) => -(a.start < b.start ? -1 : (a.start > b.start ? 1 : 0)));
     if (!isCacheExpired(storeName)) {
+        cacheContests.sort((a, b) => -(a.start < b.start ? -1 : (a.start > b.start ? 1 : 0)));
         return cacheContests;
     }
 
-    const totalCount = await getContestTotalCount(resource) || 0;
+    const totalCount = await getContestTotalCount(resource, params.event__regex) || 0;
     params.offset = getAlignedOffset(cacheContests.length, PAGE_SIZE);
+    let fetchedCount = 0;
     while (params.offset < totalCount) {
         // TODO: in parallel
         const fetchedContests = await getContestList(params);
         if (!fetchedContests.length) break;
+        fetchedCount += fetchedContests.length;
         cacheContests = cacheContests.concat(fetchedContests);
         params.offset += PAGE_SIZE;
     }
-    for (const contest of cacheContests) {
-        // no await
-        saveData(db, storeName, contest);
+    if (fetchedCount) {
+        for (const contest of cacheContests) {
+            // no await
+            saveData(db, storeName, contest);
+        }
+        touchCache(storeName);
     }
-    touchCache(storeName);
+
+    cacheContests.sort((a, b) => -(a.start < b.start ? -1 : (a.start > b.start ? 1 : 0)));
     return cacheContests;
 }
