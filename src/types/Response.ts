@@ -1,4 +1,6 @@
 
+export type BoolString = 'false' | 'true';
+
 export interface Meta {
     limit: number;
     next: string;

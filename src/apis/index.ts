@@ -1,6 +1,6 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { notification } from "antd";
-import { ListResponse } from "../types/Response";
+import { BoolString, ListResponse } from "../types/Response";
 import Account from "../types/Account";
 import Problem from "../types/Problem";
 import Statistics from "../types/Statistics";
@@ -14,12 +14,16 @@ const client = axios.create({
     headers: {
         Authorization: process.env.REACT_APP_CLIST_API_AUTH,
     },
-    timeout: 2000,
+    timeout: 4000,
 });
-client.interceptors.response.use(data => data, error => {
+client.interceptors.response.use(data => data, (error: AxiosError) => {
+    let message = error.message;
+    if (error.response?.status === 429) {
+        message = error.response.statusText;
+    }
     notification.error({
-        message: error.message,
-        description: error.stack,
+        message,
+        description: error.config?.url,
     });
     throw error;
 });
@@ -32,8 +36,10 @@ function extractItem<T>(p: Promise<AxiosResponse<ListResponse<T>>>) {
         return null;
     });
 }
-function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>>>) {
+function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>> | null>) {
     return p.then(res => {
+        if (!res) return [];
+
         const list = res.data.objects;
         return list;
     }).catch(() => {
@@ -50,21 +56,38 @@ export function getAccountByHandle(resource: string, handle__regex: string) {
     }));
 }
 
-export function getContestList(resource: string, event__regex: string, page = 0) {
-    return client.get<ListResponse<Contest<any>>>('/contest/', {
-        params: {
-            limit: 10,
-            offset: page * 10,
-            resource,
-            event__regex, 
-            upcoming: 'false',
-            total_count: 'true',
-            with_problems: 'true',
-            order_by: '-start',
-        },
-    }).catch(() => {
+interface PaginationParams {
+    limit?: number;
+    offset?: number;
+}
+export interface GetContestListParams extends PaginationParams {
+    resource: string;
+    event_regex?: string;
+    upcoming?: BoolString;
+    total_count?: BoolString;
+    with_problems?: BoolString;
+    order_by?: 'id' | '-id' | 'start' | '-start';
+}
+async function getRawContestList(params: GetContestListParams) {
+    try {
+        return client.get<ListResponse<Contest<any>>>('/contest/', {
+            params,
+        });
+    } catch (e) {
         return null;
+    }
+}
+
+export async function getContestTotalCount(resource: string) {
+    const res = await getRawContestList({
+        resource,
+        limit: 1,
+        total_count: 'true',
     });
+    return res?.data.meta.total_count;
+}
+export async function getContestList(params: GetContestListParams) {
+    return extractList(getRawContestList(params));
 }
 
 export function getProblemList(resource: string) {
