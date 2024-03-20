@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "clist-ex",
+  "name": "Extensions based on clist.by",
   "icons": [
     {
       "src": "favicon.ico",

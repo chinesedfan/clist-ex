@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import './App.css';
+import logo from './logo512.png';
 import { Card, Layout, Menu } from 'antd';
 import { ProblemPage } from './pages/ProblemPage';
 import { AboutPage } from './pages/AboutPage';
@@ -13,7 +14,8 @@ function App() {
     }, [])
     return <Layout style={{ minHeight: '100vh' }}>
         <Header style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ flex: 1, padding: '0 20px', color: 'white', fontSize: 20, fontWeight: 'bold' }}>clist-ex</div>
+            <img src={logo} style={{ height: '40px' }} alt="Extensions based on clist.by" />
+            <div style={{ flex: 1, padding: '0 10px', color: 'white', fontSize: 20, fontWeight: 'bold' }}>clist-ex</div>
             <Menu
                 theme="dark"
                 mode="horizontal"
