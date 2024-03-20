@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Flex, Table, Tooltip } from 'antd';
+import { Flex, Table, TablePaginationConfig, Tooltip } from 'antd';
 import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils/rating';
 import '../styles/problem.scss';
-import { R_CC, R_LC, getAccountByHandle, getStatisticsByAccountId } from '../apis';
+import { R_CC, R_LC, getAccountByHandle } from '../apis';
 import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, LCContestProblem, isCCContestProblem } from '../types/Contest';
 import Account from '../types/Account';
-import { loadContestList } from '../services';
+import { loadContestList, loadStatistics } from '../services';
 
 const { Column } = Table;
 
@@ -37,6 +37,11 @@ export const ProblemList: React.FC<Props> = (props) => {
     const [account, setAccount] = useState<Account>();
     const [contestMap, setContestMap] = useState<Record<string, RowData>>({});
     const [contestIds, setContestIds] = useState<number[]>([]);
+    const [pagination, setPagination] = useState<TablePaginationConfig>({
+        current: 1,
+        pageSize: 10,
+    });
+
     async function updateContestsData() {
         const contests = await loadContestList(resource);
         if (!contests) return;
@@ -104,10 +109,13 @@ export const ProblemList: React.FC<Props> = (props) => {
         })();
     }, [resource, handle]);
     useEffect(() => {
-        (async function loadStatistics() {
+        (async function updateStatistics() {
             if (!account || !contestIds.length) return;
     
-            const statistics = await getStatisticsByAccountId(account.id, contestIds);
+            const { current, pageSize } = pagination;
+            const startIndex = (current! - 1) * pageSize!;
+            const statistics = await loadStatistics(account.id,
+                contestIds.slice(startIndex, startIndex + pageSize!));
             const newContestMap = { ...contestMap };
             for (const s of statistics) {
                 if (!newContestMap[s.event]) continue;
@@ -123,7 +131,11 @@ export const ProblemList: React.FC<Props> = (props) => {
             }
             setContestMap(newContestMap);
         })();
-    }, [account, contestIds]);
+    }, [account, contestIds, pagination]);
+
+    const onTableChange = useCallback((pagination: TablePaginationConfig) => {
+        setPagination(pagination);
+    }, []);
     const contentClassName = useCallback((item?: ProblemItem) => {
         if (!item || !item.result) return '';
 
@@ -192,6 +204,7 @@ export const ProblemList: React.FC<Props> = (props) => {
     return <Table
         dataSource={Object.keys(contestMap).map(key => contestMap[key])}
         rowKey={(rowData) => rowData.contest.event}
+        onChange={onTableChange}
     >
         <Column title="Contest" dataIndex="contest" render={contestItemRender} />
         {

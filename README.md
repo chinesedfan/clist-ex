@@ -10,8 +10,10 @@ React + Antd/SASS + Axios
 
 ## Cache
 
-We save cache data in browser's IndexedDB, with following ObjectStore names,
+We save cache data in browser's IndexedDB, with fixed ObjectStore names.
 
-- contest-lc
-- contest-cc
-- statistics-<account_id>
+- db: clist-ex
+    - store: contest-lc
+    - store: contest-cc
+- db: statistics-<account_id>
+    - store: statistics

@@ -1,5 +1,6 @@
-import { GetContestListParams, R_CC, R_LC, getContestList, getContestTotalCount } from "../apis";
+import { GetContestListParams, R_CC, R_LC, getContestList, getContestTotalCount, getStatisticsByAccountId } from "../apis";
 import Contest from "../types/Contest";
+import Statistics from "../types/Statistics";
 import { getAlignedOffset } from "../utils/pagination";
 import { loadAllData, openDatabase, saveData } from "./db";
 import { isCacheExpired, touchCache } from "./localstorage";
@@ -76,4 +77,29 @@ export async function loadContestList(resource: string) {
 
     cacheContests.sort((a, b) => -(a.start < b.start ? -1 : (a.start > b.start ? 1 : 0)));
     return cacheContests;
+}
+
+export async function loadStatistics(account_id: number, contestIds: number[]) {
+    const storeName = 'statistics';
+    const db = await openDatabase(`statistics-${account_id}`, async (db) => {
+        pify(() => db.createObjectStore(storeName, {
+            keyPath: 'id',
+        }).transaction);
+    });
+    // TODO: handle bad db?
+
+    let cacheStatistics = await loadAllData<Statistics[]>(db, storeName);
+    const cacheContestIds = cacheStatistics.reduce<Record<number, number>>((o, s) => {
+        o[s.contest_id] = 1;
+        return o;
+    }, {});
+    const fetchContestIds = contestIds.filter(x => !cacheContestIds[x]);
+    if (fetchContestIds.length) {
+        const statistics = await getStatisticsByAccountId(account_id, fetchContestIds);    
+        cacheStatistics = cacheStatistics.concat(statistics);
+        for (const s of statistics) {
+            saveData(db, storeName, s);
+        }
+    }
+    return cacheStatistics;
 }
