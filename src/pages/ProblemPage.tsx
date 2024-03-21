@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Tabs } from 'antd';
 import type { RadioChangeEvent, TabsProps } from 'antd';
-import { R_CC, R_LC } from '../apis';
+import { R_CC, R_LC, getAccountByHandle } from '../apis';
 import { ProblemFilter } from '../components/ProblemFilter';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
 import { ProblemList } from './ProblemList';
+import Account from '../types/Account';
 
 const items: TabsProps['items'] = [
     {
@@ -35,22 +36,31 @@ const items: TabsProps['items'] = [
 
 export const ProblemPage: React.FC = () => {
     const [resource, setResource] = useState<string>(R_LC);
-    const [handle, setHandle] = useState<string>('');
+    const [account, setAccount] = useState<Account>();
     const [eventKeyword, setEventKeyword] = useState<string>('');
     const contextValue = useMemo(() => ({
-        onSearch: (handle: string) => {
-            setHandle(handle);
+        onSearch: async (handle: string) => {
+            if (!handle) return;
+    
+            const account = await getAccountByHandle(resource, handle);
+            if (!account) return;
+
+            setAccount(account);
         },
         onRadioChange: (e: RadioChangeEvent) => {
             setEventKeyword(e.target.value);
         },
     }), []);
+    const onTabChange = useCallback((activeKey: string) => {
+        setResource(activeKey);
+        setAccount(undefined);
+    }, []);
     return (
         <div>
             <ProblemFilterContext.Provider value={contextValue}>
-                <Tabs items={items} onChange={setResource} style={{ marginBottom: '16px' }}></Tabs>
+                <Tabs items={items} destroyInactiveTabPane onChange={onTabChange} style={{ marginBottom: '16px' }}></Tabs>
             </ProblemFilterContext.Provider>
-            <ProblemList resource={resource} handle={handle} eventKeyword={eventKeyword} />
+            <ProblemList resource={resource} account={account} eventKeyword={eventKeyword} />
         </div>
     );
 }

@@ -3,16 +3,16 @@ import { Flex, Table, TablePaginationConfig, Tooltip } from 'antd';
 import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils/rating';
 import '../styles/problem.scss';
-import { R_CC, R_LC, getAccountByHandle } from '../apis';
+import { R_CC, R_LC } from '../apis';
 import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, LCContestProblem, isCCContestProblem } from '../types/Contest';
-import Account from '../types/Account';
 import { loadContestList, loadStatistics } from '../services';
+import Account from '../types/Account';
 
 const { Column } = Table;
 
 interface Props {
     resource: string;
-    handle: string;
+    account?: Account;
     eventKeyword: string;
 }
 type RowData = {
@@ -32,9 +32,8 @@ interface ProblemItem {
 }
 
 export const ProblemList: React.FC<Props> = (props) => {
-    const { resource, handle, eventKeyword } = props;
+    const { resource, account, eventKeyword } = props;
     const [maxProblemCount, setMaxProblemCount] = useState<number>(4);
-    const [account, setAccount] = useState<Account>();
     const [contestMap, setContestMap] = useState<Record<string, RowData>>({});
     const [contestIds, setContestIds] = useState<number[]>([]);
     const [pagination, setPagination] = useState<TablePaginationConfig>({
@@ -94,20 +93,14 @@ export const ProblemList: React.FC<Props> = (props) => {
         setMaxProblemCount(maxProblemCount);
         setContestIds(contestIds);
         setContestMap(contestMap);
+        setPagination({
+            ...pagination,
+            current: 1,
+        });
     }
     useEffect(() => {
         updateContestsData();
     }, [resource, eventKeyword]);
-    useEffect(() => {
-        (async function loadAccount() {
-            if (!handle) return;
-    
-            const account = await getAccountByHandle(resource, handle);
-            if (!account) return;
-
-            setAccount(account);
-        })();
-    }, [resource, handle]);
     useEffect(() => {
         (async function updateStatistics() {
             if (!account || !contestIds.length) return;
@@ -205,6 +198,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         dataSource={Object.keys(contestMap).map(key => contestMap[key])}
         rowKey={(rowData) => rowData.contest.event}
         onChange={onTableChange}
+        pagination={pagination}
     >
         <Column title="Contest" dataIndex="contest" render={contestItemRender} />
         {
