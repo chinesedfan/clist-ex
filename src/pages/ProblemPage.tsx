@@ -60,6 +60,7 @@ export const ProblemPage: React.FC = () => {
     const onTabChange = useCallback((activeKey: string) => {
         setResource(activeKey);
         setAccount(loadLocalObject(LOCAL_ACCOUNTS, activeKey));
+        setEventKeyword('');
     }, []);
     return (
         <div>

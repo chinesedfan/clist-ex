@@ -103,7 +103,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             current: 1,
         });
     }
-    async function updateStatistics() {
+    async function updateStatistics(pagination: TablePaginationConfig) {
         const contestIds = contestIdsRef.current;
         if (!account || !contestIds.length) return;
 
@@ -132,7 +132,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             if (resourceChanged || eventKeywordChanged) {
                 await updateContestsData();
             }
-            await updateStatistics();
+            await updateStatistics(pagination);
 
             const contestMap = contestMapRef.current;
             setDataSource(Object.keys(contestMap).map(key => contestMap[key]));
@@ -144,6 +144,7 @@ export const ProblemList: React.FC<Props> = (props) => {
 
     const onTableChange = useCallback((pagination: TablePaginationConfig) => {
         setPagination(pagination);
+        updateStatistics(pagination);
     }, []);
     const contentClassName = useCallback((item?: ProblemItem) => {
         if (!item || !item.result) return '';
