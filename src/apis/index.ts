@@ -33,10 +33,10 @@ function extractItem<T>(p: Promise<AxiosResponse<ListResponse<T>>>) {
         const list = res.data.objects;
         return list[0];
     }).catch(() => {
-        return null;
+        return undefined;
     });
 }
-function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>> | null>) {
+function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>> | undefined>) {
     return p.then(res => {
         if (!res) return [];
 
@@ -74,7 +74,7 @@ async function getRawContestList(params: GetContestListParams) {
             params,
         });
     } catch (e) {
-        return null;
+        return undefined;
     }
 }
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Flex, Table, TablePaginationConfig, Tooltip } from 'antd';
 import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils/rating';
@@ -33,9 +33,14 @@ interface ProblemItem {
 
 export const ProblemList: React.FC<Props> = (props) => {
     const { resource, account, eventKeyword } = props;
+
+    const prevResourceRef = useRef<string>();
+    const prevEventKeywordRef = useRef<string>();
+    const contestMapRef = useRef<Record<string, RowData>>({});
+    const contestIdsRef = useRef<number[]>([]);
+
     const [maxProblemCount, setMaxProblemCount] = useState<number>(4);
-    const [contestMap, setContestMap] = useState<Record<string, RowData>>({});
-    const [contestIds, setContestIds] = useState<number[]>([]);
+    const [dataSource, setDataSource] = useState<RowData[]>([]);
     const [pagination, setPagination] = useState<TablePaginationConfig>({
         current: 1,
         pageSize: 10,
@@ -47,7 +52,7 @@ export const ProblemList: React.FC<Props> = (props) => {
 
         let maxProblemCount = 4;
         const contestIds: number[] = [];
-        const contestMap = contests.reduce((o, c) => {
+        contestMapRef.current = contests.reduce((o, c) => {
             if (!c.problems || c.event.indexOf(eventKeyword) < 0) return o;
 
             contestIds.push(c.id);
@@ -90,41 +95,52 @@ export const ProblemList: React.FC<Props> = (props) => {
             
             return o;
         }, {} as Record<string, RowData>)
+        contestIdsRef.current = contestIds;
+
         setMaxProblemCount(maxProblemCount);
-        setContestIds(contestIds);
-        setContestMap(contestMap);
         setPagination({
             ...pagination,
             current: 1,
         });
     }
-    useEffect(() => {
-        updateContestsData();
-    }, [resource, eventKeyword]);
-    useEffect(() => {
-        (async function updateStatistics() {
-            if (!account || !contestIds.length) return;
-    
-            const { current, pageSize } = pagination;
-            const startIndex = (current! - 1) * pageSize!;
-            const statistics = await loadStatistics(account.id,
-                contestIds.slice(startIndex, startIndex + pageSize!));
-            const newContestMap = { ...contestMap };
-            for (const s of statistics) {
-                if (!newContestMap[s.event]) continue;
-    
-                const contestItem = newContestMap[s.event].contest;
-                contestItem.place = s.place;
-                contestItem.new_rating = s.new_rating;
-                contestItem.rating_change = s.rating_change;
-                for (const title in s.problems) {
-                    const problemItem = newContestMap[s.event][title]
-                    problemItem.result = s.problems[title];
-                }
+    async function updateStatistics() {
+        const contestIds = contestIdsRef.current;
+        if (!account || !contestIds.length) return;
+
+        const { current, pageSize } = pagination;
+        const startIndex = (current! - 1) * pageSize!;
+        const statistics = await loadStatistics(account.id,
+            contestIds.slice(startIndex, startIndex + pageSize!));
+        const newContestMap = contestMapRef.current;
+        for (const s of statistics) {
+            if (!newContestMap[s.event]) continue;
+
+            const contestItem = newContestMap[s.event].contest;
+            contestItem.place = s.place;
+            contestItem.new_rating = s.new_rating;
+            contestItem.rating_change = s.rating_change;
+            for (const title in s.problems) {
+                const problemItem = newContestMap[s.event][title]
+                problemItem.result = s.problems[title];
             }
-            setContestMap(newContestMap);
+        }
+    }
+    useEffect(() => {
+        (async function() {
+            const resourceChanged = resource !== prevResourceRef.current;
+            const eventKeywordChanged = eventKeyword !== prevEventKeywordRef.current;
+            if (resourceChanged || eventKeywordChanged) {
+                await updateContestsData();
+            }
+            await updateStatistics();
+
+            const contestMap = contestMapRef.current;
+            setDataSource(Object.keys(contestMap).map(key => contestMap[key]));
+
+            prevResourceRef.current = resource;
+            prevEventKeywordRef.current = eventKeyword;
         })();
-    }, [account, contestIds, pagination]);
+    }, [resource, account, eventKeyword]);
 
     const onTableChange = useCallback((pagination: TablePaginationConfig) => {
         setPagination(pagination);
@@ -195,7 +211,7 @@ export const ProblemList: React.FC<Props> = (props) => {
     }, []);
 
     return <Table
-        dataSource={Object.keys(contestMap).map(key => contestMap[key])}
+        dataSource={dataSource}
         rowKey={(rowData) => rowData.contest.event}
         onChange={onTableChange}
         pagination={pagination}

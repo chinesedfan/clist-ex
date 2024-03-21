@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { ContextType, useCallback, useState } from 'react';
 import { Tabs } from 'antd';
 import type { RadioChangeEvent, TabsProps } from 'antd';
 import { R_CC, R_LC, getAccountByHandle } from '../apis';
@@ -6,6 +6,7 @@ import { ProblemFilter } from '../components/ProblemFilter';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
 import { ProblemList } from './ProblemList';
 import Account from '../types/Account';
+import { LOCAL_ACCOUNTS, loadLocalObject, saveLocalObject } from '../services/localstorage';
 
 const items: TabsProps['items'] = [
     {
@@ -36,24 +37,29 @@ const items: TabsProps['items'] = [
 
 export const ProblemPage: React.FC = () => {
     const [resource, setResource] = useState<string>(R_LC);
-    const [account, setAccount] = useState<Account>();
+    const [account, setAccount] = useState<Account | undefined>(() => loadLocalObject(LOCAL_ACCOUNTS, resource));
     const [eventKeyword, setEventKeyword] = useState<string>('');
-    const contextValue = useMemo(() => ({
+
+    const contextValue: ContextType<typeof ProblemFilterContext> = {
         onSearch: async (handle: string) => {
             if (!handle) return;
     
             const account = await getAccountByHandle(resource, handle);
-            if (!account) return;
-
+            const obj = loadLocalObject(LOCAL_ACCOUNTS) || {};
+            saveLocalObject(LOCAL_ACCOUNTS, {
+                ...obj,
+                [resource]: account,
+            });
             setAccount(account);
         },
         onRadioChange: (e: RadioChangeEvent) => {
             setEventKeyword(e.target.value);
         },
-    }), []);
+        account,
+    };
     const onTabChange = useCallback((activeKey: string) => {
         setResource(activeKey);
-        setAccount(undefined);
+        setAccount(loadLocalObject(LOCAL_ACCOUNTS, activeKey));
     }, []);
     return (
         <div>
