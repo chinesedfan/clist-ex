@@ -48,6 +48,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         current: 1,
         pageSize: 10,
     });
+    const [loading, setLoading] = useState(false);
 
     async function updateContestsData() {
         const contests = await loadContestList(resource);
@@ -141,6 +142,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         (async function() {
             const resourceChanged = resource !== prevResourceRef.current;
             const eventKeywordChanged = eventKeyword !== prevEventKeywordRef.current;
+            setLoading(true);
             if (resourceChanged || eventKeywordChanged) {
                 await updateContestsData();
             }
@@ -148,6 +150,7 @@ export const ProblemList: React.FC<Props> = (props) => {
 
             const contestMap = contestMapRef.current;
             setDataSource(Object.keys(contestMap).map(key => contestMap[key]));
+            setLoading(false);
 
             prevResourceRef.current = resource;
             prevEventKeywordRef.current = eventKeyword;
@@ -174,7 +177,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         } else if (item.ak_upsolved) {
             className += ' upsolved';
         }
-        return <div className={className}>{item.event}</div>;
+        return <Flex className={className}>{item.event}</Flex>;
     }, [])
     const problemItemRender = useCallback((item?: ProblemItem) => {
         if (!item) return null;
@@ -234,6 +237,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         rowKey={(rowData) => rowData.contest.event}
         onChange={onTableChange}
         pagination={pagination}
+        loading={loading}
     >
         <Column className="problem-cell" title="Contest" dataIndex="contest" render={contestItemRender} />
         {
