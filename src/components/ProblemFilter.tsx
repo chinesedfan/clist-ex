@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Col, Input, Radio, Row } from 'antd';
 import { ProblemFilterContext } from './ProblemFilterContext';
+import { R_LC } from '../apis';
 
 const { Search } = Input;
 
@@ -13,9 +14,16 @@ interface Props {
 }
 export const ProblemFilter: React.FC<Props> = props => {
     const { onRadioChange, onSearch, account } = useContext(ProblemFilterContext);
+    let defaultValue = account?.handle;
+    if (account && account.resource === R_LC) {
+        // handle in leetcode.com has extra letters
+        // i.e. chinesedfan@.com
+        defaultValue = account.name;
+    }
+
     return (<Row justify="space-between">
         <Col span={4}>
-            <Search placeholder="handle" onSearch={onSearch} defaultValue={account?.name}></Search>
+            <Search placeholder="handle" onSearch={onSearch} defaultValue={defaultValue}></Search>
         </Col>
         <Radio.Group defaultValue={0} onChange={onRadioChange}>
             { props.radios.map(item => (

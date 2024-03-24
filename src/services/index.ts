@@ -1,4 +1,4 @@
-import { GetContestListParams, R_CC, R_LC, getContestList, getContestTotalCount, getStatisticsByAccountId } from "../apis";
+import { GetContestListParams, R_CC, getContestList, getContestTotalCount, getStatisticsByAccountId } from "../apis";
 import Contest from "../types/Contest";
 import Statistics from "../types/Statistics";
 import { getAlignedOffset } from "../utils/pagination";

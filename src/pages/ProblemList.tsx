@@ -4,7 +4,7 @@ import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils/rating';
 import '../styles/problem.scss';
 import { R_CC, R_LC } from '../apis';
-import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, LCContestProblem, isCCContestProblem } from '../types/Contest';
+import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, isCCContestProblem } from '../types/Contest';
 import { loadContestList, loadStatistics } from '../services';
 import Account from '../types/Account';
 

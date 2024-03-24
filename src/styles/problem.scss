@@ -39,6 +39,9 @@ $orange: #ff8c00;
         &.upsolved {
             background-color: #c3e6cb;
         }
+        &.failed {
+            background-color: #ffeeba;
+        }
     }
     .problem-link {
         display: inline-block;
