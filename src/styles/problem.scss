@@ -32,7 +32,8 @@ $orange: #ff8c00;
     padding: 0 !important;
 
     .problem-content {
-        padding: 36px 16px;
+        height: 95px;
+        padding: 0px 16px;
         &.solved {
             background-color: #9ad59e;
         }

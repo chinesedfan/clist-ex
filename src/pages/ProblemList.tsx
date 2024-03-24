@@ -177,7 +177,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         } else if (item.ak_upsolved) {
             className += ' upsolved';
         }
-        return <Flex className={className}>{item.event}</Flex>;
+        return <Flex className={className} align="center">{item.event}</Flex>;
     }, [])
     const problemItemRender = useCallback((item?: ProblemItem) => {
         if (!item) return null;
