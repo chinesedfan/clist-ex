@@ -7,8 +7,8 @@ import { isCacheExpired, touchCache } from "./localstorage";
 
 const PAGE_SIZE = 200;
 const DB_NAME = 'clist-ex';
-const STORE_LC = 'contest-lc';
-const STORE_CC = 'contest-cc';
+export const STORE_LC = 'contest-lc';
+export const STORE_CC = 'contest-cc';
 
 let db: IDBDatabase
 
