@@ -21,7 +21,10 @@ type RowData = {
 
 interface ContestItem {
     event: string;
+    n_problems: number;
     // parsed from Statistics
+    ak?: boolean;
+    ak_upsolved?: boolean;
     place?: number;
     new_rating?: number;
     rating_change?: number;
@@ -59,6 +62,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             o[c.event] = {
                 contest: {
                     event: c.event,
+                    n_problems: c.n_problems,
                 },
             } as RowData; 
 
@@ -119,10 +123,18 @@ export const ProblemList: React.FC<Props> = (props) => {
             contestItem.place = s.place;
             contestItem.new_rating = s.new_rating;
             contestItem.rating_change = s.rating_change;
+            let solvedCount = 0, upsolvedCount = 0
             for (const title in s.problems) {
                 const problemItem = newContestMap[s.event][title]
                 problemItem.result = s.problems[title];
+                if (isUpsolvingResult(problemItem.result)) {
+                    upsolvedCount++
+                } else {
+                    solvedCount++;
+                }
             }
+            contestItem.ak = solvedCount === contestItem.n_problems;
+            contestItem.ak_upsolved = solvedCount + upsolvedCount === contestItem.n_problems;
         }
     }
     useEffect(() => {
@@ -156,7 +168,13 @@ export const ProblemList: React.FC<Props> = (props) => {
         }
     }, []);
     const contestItemRender = useCallback((item: ContestItem) => {
-        return item.event;
+        let className = 'problem-content';
+        if (item.ak) {
+            className += ' solved';
+        } else if (item.ak_upsolved) {
+            className += ' upsolved';
+        }
+        return <div className={className}>{item.event}</div>;
     }, [])
     const problemItemRender = useCallback((item?: ProblemItem) => {
         if (!item) return null;
@@ -217,7 +235,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         onChange={onTableChange}
         pagination={pagination}
     >
-        <Column title="Contest" dataIndex="contest" render={contestItemRender} />
+        <Column className="problem-cell" title="Contest" dataIndex="contest" render={contestItemRender} />
         {
             Array(maxProblemCount)
                 .fill(0)
