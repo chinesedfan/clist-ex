@@ -57,7 +57,7 @@ export const ProblemList: React.FC<Props> = (props) => {
         let maxProblemCount = 4;
         const contestIds: number[] = [];
         contestMapRef.current = contests.reduce((o, c) => {
-            if (!c.problems || c.event.indexOf(eventKeyword) < 0) return o;
+            if (!c.problems || !(new RegExp(eventKeyword)).test(c.event)) return o;
 
             contestIds.push(c.id);
             o[c.event] = {
