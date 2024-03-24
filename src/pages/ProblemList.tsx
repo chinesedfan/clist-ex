@@ -162,8 +162,8 @@ export const ProblemList: React.FC<Props> = (props) => {
         if (!item) return null;
 
         const { problem, result } = item;
-        const color = getRatingColor(problem.rating);
-        const percent = getRatingPercent(problem.rating);
+        const color = getRatingColor(resource, problem.rating);
+        const percent = getRatingPercent(resource, problem.rating);
         const circleStyle = {
             borderColor: color,
             background: `linear-gradient(to top, ${color} ${percent}%, white ${percent}%)`,
@@ -209,7 +209,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                 </div>
             }
         </>;
-    }, []);
+    }, [resource]);
 
     return <Table
         dataSource={dataSource}
