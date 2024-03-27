@@ -5,16 +5,19 @@ import Account from "../types/Account";
 import Problem from "../types/Problem";
 import Statistics from "../types/Statistics";
 import Contest from "../types/Contest";
+import { LOCAL_API_KEY } from "../services/localstorage";
 
 export const R_LC = 'leetcode.com';
 export const R_CC = 'codechef.com';
 
 const client = axios.create({
     baseURL: 'https://clist.by/api/v4',
-    headers: {
-        Authorization: process.env.REACT_APP_CLIST_API_AUTH,
-    },
     timeout: 5000,
+});
+client.interceptors.request.use(config => {
+    config.headers.Authorization =
+        localStorage.getItem(LOCAL_API_KEY) || process.env.REACT_APP_CLIST_API_AUTH;
+    return config;
 });
 client.interceptors.response.use(data => data, (error: AxiosError) => {
     let message = error.message;

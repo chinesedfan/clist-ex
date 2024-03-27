@@ -1,11 +1,19 @@
-import { Button, Flex, Typography, notification } from "antd";
-import { useCallback } from "react";
+import { Button, Flex, Input, Space, Typography, notification } from "antd";
+import { useCallback, useState } from "react";
 import { STORE_CC, STORE_LC } from "../services";
+import { LOCAL_API_KEY } from "../services/localstorage";
 
 const { Title } = Typography;
 
 export const SettingsPage: React.FC<any> = (props) => {
-    const onButtonClicked = useCallback((storeName: string) => {
+    const [apiKey, setAPIKey] = useState(localStorage.getItem(LOCAL_API_KEY) || '');
+    const onBtnSaveKeyClicked = useCallback(() => {
+        localStorage.setItem(LOCAL_API_KEY, apiKey);
+        notification.info({
+            message: `Save ${LOCAL_API_KEY} in local storage.`,
+        });
+    }, [apiKey]);
+    const onBtnResetLockClicked = useCallback((storeName: string) => {
         localStorage.removeItem(storeName);
         notification.info({
             message: `Remove ${storeName} in local storage.`,
@@ -13,11 +21,17 @@ export const SettingsPage: React.FC<any> = (props) => {
     }, []);
 
     return (<>
+        <Title level={3}>API Key</Title>
+        <p>Set your own key according to <a href="https://clist.by/api/v4/doc/" target="_blank">clist.by docs</a>. Leaving it empty will use the default API key, which only supports 10 request per minute. Users may face "Too many requests" errors easily.</p>
+        <Space.Compact style={{ width: '600px' }}>
+            <Input placeholder="ApiKey xxx:xxx" defaultValue={apiKey} onChange={(e) => setAPIKey(e.currentTarget.value)}></Input>
+            <Button type="primary" onClick={onBtnSaveKeyClicked}>Save</Button>
+        </Space.Compact>
         <Title level={3}>Reset Cache</Title>
         <p>By default, contests will only be loaded in every 2 days, and a timestamp is saved in local storage. If failed or want to reload immediately, click following buttons.</p>
         <Flex>
-            <Button type="primary" onClick={() => onButtonClicked(STORE_LC)}>LeetCode Contests</Button>
-            <Button type="primary" onClick={() => onButtonClicked(STORE_CC)} style={{ marginLeft: '20px' }}>CodeChef Contests</Button>
+            <Button type="primary" onClick={() => onBtnResetLockClicked(STORE_LC)}>LeetCode Contests</Button>
+            <Button type="primary" onClick={() => onBtnResetLockClicked(STORE_CC)} style={{ marginLeft: '20px' }}>CodeChef Contests</Button>
         </Flex>
     </>);
 }

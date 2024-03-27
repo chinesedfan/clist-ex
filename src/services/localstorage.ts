@@ -1,6 +1,7 @@
 const EXPIRE_LIMIT_MS = 24 * 3600 * 1000; // 1 day
 
 export const LOCAL_ACCOUNTS = 'local-accounts';
+export const LOCAL_API_KEY = 'local-clist-apikey';
 
 export function isCacheExpired(key: string) {
     const value = localStorage.getItem(key);
