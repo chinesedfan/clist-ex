@@ -1,16 +1,16 @@
 import { Button, Flex, Input, Space, Typography, notification } from "antd";
 import { useCallback, useState } from "react";
 import { STORE_CC, STORE_LC } from "../services";
-import { LOCAL_API_KEY } from "../services/localstorage";
+import { LOCAL_CLIST_APIKEY } from "../services/localstorage";
 
 const { Title } = Typography;
 
 export const SettingsPage: React.FC<any> = (props) => {
-    const [apiKey, setAPIKey] = useState(localStorage.getItem(LOCAL_API_KEY) || '');
+    const [apiKey, setAPIKey] = useState(localStorage.getItem(LOCAL_CLIST_APIKEY) || '');
     const onBtnSaveKeyClicked = useCallback(() => {
-        localStorage.setItem(LOCAL_API_KEY, apiKey);
+        localStorage.setItem(LOCAL_CLIST_APIKEY, apiKey);
         notification.info({
-            message: `Save ${LOCAL_API_KEY} in local storage.`,
+            message: `Save ${LOCAL_CLIST_APIKEY} in local storage.`,
         });
     }, [apiKey]);
     const onBtnResetLockClicked = useCallback((storeName: string) => {

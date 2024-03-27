@@ -1,12 +1,12 @@
 import React, { ContextType, useCallback, useState } from 'react';
-import { Tabs } from 'antd';
+import { Alert, Tabs } from 'antd';
 import type { RadioChangeEvent, TabsProps } from 'antd';
 import { R_CC, R_LC, getAccountByHandle } from '../apis';
 import { ProblemFilter } from '../components/ProblemFilter';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
 import { ProblemList } from './ProblemList';
 import Account from '../types/Account';
-import { LOCAL_ACCOUNTS, loadLocalObject, saveLocalObject } from '../services/localstorage';
+import { LOCAL_ACCOUNTS, LOCAL_HIDE_ALERT_RETRY, loadLocalObject, saveLocalObject } from '../services/localstorage';
 
 const items: TabsProps['items'] = [
     {
@@ -62,8 +62,12 @@ export const ProblemPage: React.FC = () => {
         setAccount(loadLocalObject(LOCAL_ACCOUNTS, activeKey));
         setEventKeyword('');
     }, []);
+
+    const hideAlertRetry = localStorage.getItem(LOCAL_HIDE_ALERT_RETRY);
+
     return (
         <div>
+            { !hideAlertRetry && <Alert message="It may cost more time when loading contests at the first time. If failed, please switch LeetCode/CodeChef tabs to retry." type="info" showIcon closable onClose={() => localStorage.setItem(LOCAL_HIDE_ALERT_RETRY, '1')} />}
             <ProblemFilterContext.Provider value={contextValue}>
                 <Tabs items={items} destroyInactiveTabPane onChange={onTabChange} style={{ marginBottom: '16px' }}></Tabs>
             </ProblemFilterContext.Provider>
