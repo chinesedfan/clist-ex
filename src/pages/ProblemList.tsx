@@ -3,6 +3,8 @@ import { Flex, Table, TablePaginationConfig, Tooltip } from 'antd';
 import { StatisticsResult, isUpsolvingResult } from '../types/Statistics';
 import { getRatingColor, getRatingPercent } from '../utils/rating';
 import '../styles/problem.scss';
+import { ReactComponent as IconUp } from '../styles/anticon-up.svg';
+import { ReactComponent as IconDown } from '../styles/anticon-down.svg';
 import { R_CC, R_LC } from '../apis';
 import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, isCCContestProblem } from '../types/Contest';
 import { loadContestList, loadStatistics } from '../services';
@@ -23,8 +25,8 @@ interface ContestItem {
     event: string;
     n_problems: number;
     // parsed from Statistics
-    ak?: boolean;
-    ak_upsolved?: boolean;
+    n_problems_solved?: number;
+    n_problems_upsolved?: number;
     place?: number;
     new_rating?: number;
     rating_change?: number;
@@ -134,8 +136,8 @@ export const ProblemList: React.FC<Props> = (props) => {
                     solvedCount++;
                 }
             }
-            contestItem.ak = solvedCount === contestItem.n_problems;
-            contestItem.ak_upsolved = solvedCount + upsolvedCount === contestItem.n_problems;
+            contestItem.n_problems_solved = solvedCount;
+            contestItem.n_problems_upsolved = upsolvedCount;
         }
     }
     useEffect(() => {
@@ -171,14 +173,35 @@ export const ProblemList: React.FC<Props> = (props) => {
         }
     }, []);
     const contestItemRender = useCallback((item: ContestItem) => {
+        const  {
+            n_problems, n_problems_solved, n_problems_upsolved,
+            place, new_rating, rating_change
+        } = item;
+        // FIXME: lots of type assert
         let className = 'problem-content';
-        if (item.ak) {
+        if (n_problems_solved === n_problems) {
             className += ' solved';
-        } else if (item.ak_upsolved) {
+        } else if (n_problems_solved! + n_problems_upsolved! === n_problems) {
             className += ' upsolved';
         }
-        return <Flex className={className} align="center">{item.event}</Flex>;
-    }, [])
+        let statisticsClassName = 'contest-statistics' 
+        if (resource === R_CC) statisticsClassName += ' code-chef';
+
+        const ratingColor = getRatingColor(resource, new_rating || 0);
+        const ratingChangeIcon = rating_change! >= 0 ? <IconUp /> : <IconDown />;
+        const ratingChangeColor = rating_change! >= 0 ? 'green' : 'red';
+
+        return <>
+            <Flex className={className} align="center">{item.event}</Flex>
+            { n_problems_solved! > 0 && <Flex className={statisticsClassName} align="center">
+                <div style={{ fontWeight: 'bold', color: ratingColor, marginRight: '5px' }}>{new_rating}</div>
+                { ratingChangeIcon }
+                <div style={{ marginLeft: '1px', color: ratingChangeColor, fontWeight: 'bold' }}>{Math.abs(rating_change!)}</div>
+                <div className="contest-place">rank {place}</div>
+            </Flex>
+            }
+        </>
+    }, [resource])
     const problemItemRender = useCallback((item?: ProblemItem) => {
         if (!item) return null;
 

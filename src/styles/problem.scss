@@ -3,6 +3,42 @@ $voilet: #a0a;
 $yellow: #bb0;
 $orange: #ff8c00;
 
+.problem-cell {
+    padding: 0 !important;
+
+    .problem-content {
+        height: 95px;
+        padding: 0px 16px;
+        &.solved {
+            background-color: #9ad59e;
+        }
+        &.upsolved {
+            background-color: #c3e6cb;
+        }
+        &.failed {
+            background-color: #ffeeba;
+        }
+    }
+}
+
+.contest-statistics {
+    position: absolute;
+    bottom: 10px;
+    left: 16px;
+    right: 16px;
+    z-index: 10;
+
+    &.code-chef {
+        bottom: -2px;
+        right: -40px;
+    }
+}
+.contest-place {
+    margin-left: 5px;
+    flex: 1;
+    color: #888;
+}
+
 .difficult-circle {
     position: relative;
     display: inline-block;
@@ -28,62 +64,45 @@ $orange: #ff8c00;
         border-radius: 50%;
     }
 }
-.problem-cell {
-    padding: 0 !important;
+.problem-link {
+    display: inline-block;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    .problem-content {
-        height: 95px;
-        padding: 0px 16px;
-        &.solved {
-            background-color: #9ad59e;
-        }
-        &.upsolved {
-            background-color: #c3e6cb;
-        }
-        &.failed {
-            background-color: #ffeeba;
-        }
-    }
-    .problem-link {
-        display: inline-block;
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+.problem-statistics {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+.problem-time {
+    color: #888;
+}
+.problem-penalty {
+    margin-left: 5px;
+    color: red;
+}
 
-    .problem-statistics {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-    }
-    .problem-time {
-        color: #888;
-    }
-    .problem-penalty {
-        margin-left: 5px;
-        color: red;
-    }
-
-    .problem-divisions {
-        position: absolute;
-        top: 10px;
-        left: 0;
-        right: 0;
-    }
-    .problem-div-1, .problem-div-2, .problem-div-3, .problem-div-4 {
-        height: 4px;
-    }
-    .problem-div-1 {
-        background: red;
-    }
-    .problem-div-2 {
-        background: $orange;
-    }
-    .problem-div-3 {
-        background: $cyan;
-    }
-    .problem-div-4 {
-        background: grey;
-    }
+.problem-divisions {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+}
+.problem-div-1, .problem-div-2, .problem-div-3, .problem-div-4 {
+    height: 4px;
+}
+.problem-div-1 {
+    background: red;
+}
+.problem-div-2 {
+    background: $orange;
+}
+.problem-div-3 {
+    background: $cyan;
+}
+.problem-div-4 {
+    background: grey;
 }
