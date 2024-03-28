@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Col, Input, Radio, Row } from 'antd';
 import { ProblemFilterContext } from './ProblemFilterContext';
 import { R_LC } from '../apis';
@@ -13,6 +13,7 @@ interface Props {
     radios: RadioItem[];
 }
 export const ProblemFilter: React.FC<Props> = props => {
+    const [loading, setLoading] = useState(false);
     const { onRadioChange, onSearch, account } = useContext(ProblemFilterContext);
     let defaultValue = account?.handle;
     if (account && account.resource === R_LC) {
@@ -23,7 +24,7 @@ export const ProblemFilter: React.FC<Props> = props => {
 
     return (<Row justify="space-between">
         <Col span={4}>
-            <Search placeholder="handle" onSearch={onSearch} defaultValue={defaultValue}></Search>
+            <Search placeholder="handle" onSearch={(key) => onSearch!(key, setLoading)} loading={loading} defaultValue={defaultValue}></Search>
         </Col>
         <Radio.Group defaultValue={0} onChange={onRadioChange}>
             { props.radios.map(item => (

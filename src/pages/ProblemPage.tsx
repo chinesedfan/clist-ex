@@ -41,9 +41,10 @@ export const ProblemPage: React.FC = () => {
     const [eventKeyword, setEventKeyword] = useState<string>('');
 
     const contextValue: ContextType<typeof ProblemFilterContext> = {
-        onSearch: async (handle: string) => {
+        onSearch: async (handle, setLoading) => {
             if (!handle) return;
     
+            setLoading(true);
             const account = await getAccountByHandle(resource, handle);
             const obj = loadLocalObject(LOCAL_ACCOUNTS) || {};
             saveLocalObject(LOCAL_ACCOUNTS, {
@@ -51,6 +52,7 @@ export const ProblemPage: React.FC = () => {
                 [resource]: account,
             });
             setAccount(account);
+            setLoading(false);
         },
         onRadioChange: (e: RadioChangeEvent) => {
             setEventKeyword(e.target.value);
