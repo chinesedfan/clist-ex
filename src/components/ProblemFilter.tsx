@@ -26,7 +26,7 @@ export const ProblemFilter: React.FC<Props> = props => {
         <Col span={4}>
             <Search placeholder="handle" onSearch={(key) => onSearch!(key, setLoading)} loading={loading} defaultValue={defaultValue}></Search>
         </Col>
-        <Radio.Group defaultValue={0} onChange={onRadioChange}>
+        <Radio.Group defaultValue={''} onChange={onRadioChange}>
             { props.radios.map(item => (
                 <Radio.Button value={item.value} key={item.value}>{item.label}</Radio.Button>
             ))}

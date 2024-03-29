@@ -14,7 +14,7 @@ const items: TabsProps['items'] = [
         label: 'LeetCode',
         children: (
             <ProblemFilter radios={[
-                { label: 'All', value: 0 },
+                { label: 'All', value: '' },
                 { label: 'Weekly', value: 'Weekly' },
                 { label: 'Biweekly', value: 'Biweekly' },
             ]}></ProblemFilter>        
@@ -25,7 +25,7 @@ const items: TabsProps['items'] = [
         label: 'CodeChef',
         children: (
             <ProblemFilter radios={[
-                { label: 'All', value: 0 },
+                { label: 'All', value: '' },
                 { label: 'Rated for All', value: 'All' },
                 { label: 'Rated till 6-stars', value: '6.[Ss]tars' },
                 { label: 'Rated till 5-stars', value: '5.[Ss]tars' },

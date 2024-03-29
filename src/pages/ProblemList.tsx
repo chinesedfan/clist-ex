@@ -62,7 +62,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             if (!c.problems || !(new RegExp(eventKeyword)).test(c.event)) return o;
 
             contestIds.push(c.id);
-            o[c.event] = {
+            o[c.id] = {
                 contest: {
                     event: c.event,
                     n_problems: c.n_problems,
@@ -75,7 +75,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                         problem: p,
                     }
                     return rowData;
-                }, o[c.event]);
+                }, o[c.id]);
             } else if (resource === R_CC) {
                 const { division, divisions_order} = (c as CCContest).problems!;
                 const problemMap: Record<string, CCContestProblem> = {};
@@ -93,7 +93,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                 let index = 0;
                 for (const short in problemMap) {
                     // copy to `short` as key
-                    o[c.event]['Q' + (++index)] = o[c.event][short] = {
+                    o[c.id]['Q' + (++index)] = o[c.id][short] = {
                         problem: problemMap[short],
                     };
                 }
@@ -120,15 +120,15 @@ export const ProblemList: React.FC<Props> = (props) => {
             contestIds.slice(startIndex, startIndex + pageSize!));
         const newContestMap = contestMapRef.current;
         for (const s of statistics) {
-            if (!newContestMap[s.event]) continue;
+            if (!newContestMap[s.contest_id]) continue;
 
-            const contestItem = newContestMap[s.event].contest;
+            const contestItem = newContestMap[s.contest_id].contest;
             contestItem.place = s.place;
             contestItem.new_rating = s.new_rating;
             contestItem.rating_change = s.rating_change;
             let solvedCount = 0, upsolvedCount = 0
             for (const title in s.problems) {
-                const problemItem = newContestMap[s.event][title]
+                const problemItem = newContestMap[s.contest_id][title]
                 problemItem.result = s.problems[title];
                 if (isUpsolvingResult(problemItem.result)) {
                     upsolvedCount++
@@ -151,7 +151,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             await updateStatistics(pagination);
 
             const contestMap = contestMapRef.current;
-            setDataSource(Object.keys(contestMap).map(key => contestMap[key]));
+            setDataSource(contestIdsRef.current.map(key => contestMap[key]));
             setLoading(false);
 
             prevResourceRef.current = resource;
