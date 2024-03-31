@@ -4,6 +4,7 @@ import Statistics from "../types/Statistics";
 import { getAlignedOffset } from "../utils/pagination";
 import { loadAllData, openDatabase, saveData } from "./db";
 import { isCacheExpired, touchCache } from "./localstorage";
+import { log } from "../utils/log";
 
 const PAGE_SIZE = 200;
 const DB_NAME = 'clist-ex';
@@ -56,6 +57,7 @@ export async function loadContestList(resource: string) {
         return cacheContests;
     }
 
+    const cacheContestIds = cacheContests.map(c => c.id);
     const totalCount = await getContestTotalCount(resource, params.event__regex) || 0;
     params.offset = getAlignedOffset(cacheContests.length, PAGE_SIZE);
     let fetchedCount = 0;
@@ -63,17 +65,20 @@ export async function loadContestList(resource: string) {
         // TODO: in parallel
         const fetchedContests = await getContestList(params);
         if (!fetchedContests.length) break;
-        fetchedCount += fetchedContests.length;
-        cacheContests = cacheContests.concat(fetchedContests);
+
+        for (const c of fetchedContests) {
+            if (cacheContestIds.indexOf(c.id) < 0) {
+                fetchedCount++;
+                cacheContests.push(c);
+                saveData(db, storeName, c);
+            }
+        }
         params.offset += PAGE_SIZE;
     }
     if (fetchedCount) {
-        for (const contest of cacheContests) {
-            // no await
-            saveData(db, storeName, contest);
-        }
         touchCache(storeName);
     }
+    log(`[service] loadContestList: fetchedCount=${fetchedCount}.`);
 
     cacheContests.sort((a, b) => -(a.start < b.start ? -1 : (a.start > b.start ? 1 : 0)));
     return cacheContests;
