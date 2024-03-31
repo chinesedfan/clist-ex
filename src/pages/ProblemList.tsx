@@ -22,6 +22,7 @@ type RowData = {
 } & Record<string, ProblemItem>;
 
 interface ContestItem {
+    id: number;
     event: string;
     n_problems: number;
     // parsed from Statistics
@@ -64,6 +65,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             contestIds.push(c.id);
             o[c.id] = {
                 contest: {
+                    id: c.id,
                     event: c.event,
                     n_problems: c.n_problems,
                 },
@@ -257,7 +259,7 @@ export const ProblemList: React.FC<Props> = (props) => {
 
     return <Table
         dataSource={dataSource}
-        rowKey={(rowData) => rowData.contest.event}
+        rowKey={(rowData) => rowData.contest.id}
         onChange={onTableChange}
         pagination={pagination}
         loading={loading}
