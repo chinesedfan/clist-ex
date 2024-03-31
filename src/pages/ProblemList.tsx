@@ -162,8 +162,13 @@ export const ProblemList: React.FC<Props> = (props) => {
     }, [resource, account, eventKeyword]);
 
     const onTableChange = useCallback((pagination: TablePaginationConfig) => {
-        setPagination(pagination);
-        updateStatistics(pagination);
+        (async function() {
+            // no setter called, make sure rerender is triggered
+            setLoading(true);
+            await updateStatistics(pagination);
+            setPagination(pagination);
+            setLoading(false);
+        })();
     }, []);
     const contentClassName = useCallback((item?: ProblemItem) => {
         if (!item || !item.result) return '';
