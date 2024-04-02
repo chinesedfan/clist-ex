@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { notification } from "antd";
 
 notification.config({
-  duration: 3,
+  duration: 1.5,
 })
 
 const root = ReactDOM.createRoot(
