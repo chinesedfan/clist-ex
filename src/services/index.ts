@@ -3,7 +3,7 @@ import Contest from "../types/Contest";
 import Statistics from "../types/Statistics";
 import { getAlignedOffset } from "../utils/pagination";
 import { loadAllData, openDatabase, saveData } from "./db";
-import { isCacheExpired, touchCache } from "./localstorage";
+import { LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, isCacheExpired, touchCache } from "./localstorage";
 import { log } from "../utils/log";
 
 const PAGE_SIZE = 200;
@@ -84,27 +84,59 @@ export async function loadContestList(resource: string) {
     return cacheContests;
 }
 
+function isEmptyStatistics(s: Statistics) {
+    return s.id === undefined; // internal design
+}
+
 export async function loadStatistics(account_id: number, contestIds: number[]) {
     const storeName = 'statistics';
     const db = await openDatabase(`statistics-${account_id}`, async (db) => {
         pify(() => db.createObjectStore(storeName, {
-            keyPath: 'id',
+            keyPath: 'contest_id',
         }).transaction);
     });
     // TODO: handle bad db?
 
-    let cacheStatistics = await loadAllData<Statistics[]>(db, storeName);
-    const cacheContestIds = cacheStatistics.reduce<Record<number, number>>((o, s) => {
-        o[s.contest_id] = 1;
-        return o;
-    }, {});
-    const fetchContestIds = contestIds.filter(x => !cacheContestIds[x]);
+    const strategy = localStorage.getItem(LOCAL_STATISTICS_STRATEGY) || StatisticsStrategy.CacheFirstIfNonEmpty;
+    const statisticsMap: Record<number, Statistics> = {}
+
+    const cacheContestIds: number[] = [];
+    const nonEmptyCacheContestIds: number[] = [], emptyCacheContestIds: number[] = [];
+    const cacheStatistics = await loadAllData<Statistics[]>(db, storeName);
+    for (const s of cacheStatistics) {
+        if (isEmptyStatistics(s)) {
+            emptyCacheContestIds.push(s.contest_id);
+        } else {
+            nonEmptyCacheContestIds.push(s.contest_id);
+            statisticsMap[s.contest_id] = s;
+        }
+        cacheContestIds.push(s.contest_id);
+    }
+    const fetchContestIds = contestIds.filter(cid => {
+        switch (strategy) {
+            case StatisticsStrategy.CacheFirst:
+                return cacheContestIds.indexOf(cid) < 0;
+            case StatisticsStrategy.CacheFirstIfNonEmpty:
+                return nonEmptyCacheContestIds.indexOf(cid) < 0;
+            case StatisticsStrategy.NetworkFirst:
+            default:
+                return true;
+        }
+    });
     if (fetchContestIds.length) {
-        const statistics = await getStatisticsByAccountId(account_id, fetchContestIds);    
-        cacheStatistics = cacheStatistics.concat(statistics);
-        for (const s of statistics) {
+        const fetchStatistics = await getStatisticsByAccountId(account_id, fetchContestIds);    
+        const succFetchContestIds = fetchStatistics.map(s => s.contest_id);
+        for (const s of fetchStatistics) {
+            statisticsMap[s.contest_id] = s;
             saveData(db, storeName, s);
         }
+        for (const cid of fetchContestIds) {
+            if (succFetchContestIds.indexOf(cid) < 0 && nonEmptyCacheContestIds.indexOf(cid) < 0) {
+                saveData(db, storeName, {
+                    contest_id: cid,
+                });
+            }
+        }
     }
-    return cacheStatistics;
+    return Object.keys(statisticsMap).map(cid => statisticsMap[cid as any]);
 }

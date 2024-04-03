@@ -8,7 +8,7 @@ export const LOCAL_CLIST_APIKEY = 'local-clist-apikey';
 export const LOCAL_STATISTICS_STRATEGY = 'local-statistics-strategy';
 
 export enum StatisticsStrategy {
-    NetworkOnly = 'network-only',
+    NetworkFirst = 'network-first',
     CacheFirst = 'cache-first',
     CacheFirstIfNonEmpty = 'cache-first-if-nonempty',
 };

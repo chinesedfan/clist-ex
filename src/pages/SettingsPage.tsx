@@ -6,7 +6,7 @@ import { LOCAL_CLIST_APIKEY, LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, useL
 const { Title } = Typography;
 
 const strategyRadioItems = [
-    { label: 'Network Only', value: StatisticsStrategy.NetworkOnly },
+    { label: 'Network First', value: StatisticsStrategy.NetworkFirst },
     { label: 'Cache First (if Non-Empty)', value: StatisticsStrategy.CacheFirstIfNonEmpty },
     { label: 'Cache First', value: StatisticsStrategy.CacheFirst },
 ];

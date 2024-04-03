@@ -1,6 +1,6 @@
 // https://github.com/kenkoooo/AtCoderProblems/blob/master/atcoder-problems-frontend/src/database/index.ts
 // commit hash: 2ff98c3
-const VERSION = 1;
+const VERSION = 2;
 export const openDatabase = (
   dbName: string,
   onUpgradeNeeded: (db: IDBDatabase) => Promise<void>
