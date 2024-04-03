@@ -13,7 +13,9 @@ const strategyRadioItems = [
 
 export const SettingsPage: React.FC<any> = (props) => {
     const [apiKey, setAPIKey] = useState(localStorage.getItem(LOCAL_CLIST_APIKEY) || '');
-    const [strategy, setStrategy] = useLocalStorage(LOCAL_STATISTICS_STRATEGY, StatisticsStrategy.CacheFirstIfNonEmpty);
+    const [strategy, setStrategy] = useLocalStorage(LOCAL_STATISTICS_STRATEGY, StatisticsStrategy.CacheFirstIfNonEmpty, {
+        raw: true,
+    });
     const onBtnSaveKeyClicked = useCallback(() => {
         localStorage.setItem(LOCAL_CLIST_APIKEY, apiKey);
         notification.info({

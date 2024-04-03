@@ -11,11 +11,13 @@ const DB_NAME = 'clist-ex';
 export const STORE_LC = 'contest-lc';
 export const STORE_CC = 'contest-cc';
 
-let db: IDBDatabase
-
-function pify(fn: () => IDBTransaction) {
+function createObjectStorePromise(db: IDBDatabase, name: string, options?: IDBObjectStoreParameters) {
     return new Promise<void>((resolve, reject) => {
-        const transaction = fn();
+        if (db.objectStoreNames.contains(name)) {
+            db.deleteObjectStore(name);
+        }
+
+        const transaction = db.createObjectStore(name, options).transaction;
         transaction.oncomplete = () => resolve();
         transaction.onerror = reject;
     });
@@ -24,18 +26,18 @@ function pify(fn: () => IDBTransaction) {
 function openClistExDatabase() {
     return openDatabase(DB_NAME, async (db) => {
         await Promise.all([
-            pify(() => db.createObjectStore(STORE_LC, {
+            createObjectStorePromise(db, STORE_LC, {
                 keyPath: 'id',
-            }).transaction),
-            pify(() => db.createObjectStore(STORE_CC, {
+            }),
+            createObjectStorePromise(db, STORE_CC, {
                 keyPath: 'id',
-            }).transaction),
+            }),
         ])
     });
 }
 
 export async function loadContestList(resource: string) {
-    if (!db) db = await openClistExDatabase();
+    const db = await openClistExDatabase();
 
     const params: GetContestListParams = {
         resource,
@@ -91,9 +93,9 @@ function isEmptyStatistics(s: Statistics) {
 export async function loadStatistics(account_id: number, contestIds: number[]) {
     const storeName = 'statistics';
     const db = await openDatabase(`statistics-${account_id}`, async (db) => {
-        pify(() => db.createObjectStore(storeName, {
+        await createObjectStorePromise(db, storeName, {
             keyPath: 'contest_id',
-        }).transaction);
+        });
     });
     // TODO: handle bad db?
 
