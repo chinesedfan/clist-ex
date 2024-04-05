@@ -5,6 +5,7 @@ import { getAlignedOffset } from "../utils/pagination";
 import { loadAllData, openDatabase, saveData } from "./db";
 import { LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, isCacheExpired, touchCache } from "./localstorage";
 import { log } from "../utils/log";
+import { notification } from "antd";
 
 const PAGE_SIZE = 200;
 const DB_NAME = 'clist-ex';
@@ -65,6 +66,9 @@ export async function loadContestList(resource: string) {
     let fetchedCount = 0;
     while (params.offset < totalCount) {
         // TODO: in parallel
+        notification.info({
+            message: `loading contest ${params.offset}/${totalCount}`,
+        });
         const fetchedContests = await getContestList(params);
         if (!fetchedContests.length) break;
 

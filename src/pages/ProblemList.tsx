@@ -194,16 +194,22 @@ export const ProblemList: React.FC<Props> = (props) => {
         let statisticsClassName = 'contest-statistics' 
         if (resource === R_CC) statisticsClassName += ' code-chef';
 
-        const ratingColor = getRatingColor(resource, new_rating || 0);
-        const ratingChangeIcon = rating_change! >= 0 ? <IconUp /> : <IconDown />;
-        const ratingChangeColor = rating_change! >= 0 ? 'green' : 'red';
+        const ratingColor = new_rating ? getRatingColor(resource, new_rating) : 'grey';
+        let ratingChangeSegment = <></>;
+        if (rating_change !== undefined) {
+            const ratingChangeIcon = rating_change >= 0 ? <IconUp /> : <IconDown />;
+            const ratingChangeColor = rating_change >= 0 ? 'green' : 'red';
+            ratingChangeSegment = <>
+                { ratingChangeIcon }
+                <div style={{ marginLeft: '1px', color: ratingChangeColor, fontWeight: 'bold' }}>{Math.abs(rating_change!)}</div>
+            </>;
+        }
 
         return <>
             <Flex className={className} align="center">{item.event}</Flex>
             { n_problems_solved! > 0 && <Flex className={statisticsClassName} align="center">
-                <div style={{ fontWeight: 'bold', color: ratingColor, marginRight: '5px' }}>{new_rating}</div>
-                { ratingChangeIcon }
-                <div style={{ marginLeft: '1px', color: ratingChangeColor, fontWeight: 'bold' }}>{Math.abs(rating_change!)}</div>
+                <div style={{ fontWeight: 'bold', color: ratingColor, marginRight: '5px' }}>{new_rating || '-'}</div>
+                { ratingChangeSegment }
                 <div className="contest-place">rank {place}</div>
             </Flex>
             }
