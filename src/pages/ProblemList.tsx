@@ -169,7 +169,7 @@ export const ProblemList: React.FC<Props> = (props) => {
             setPagination(pagination);
             setLoading(false);
         })();
-    }, []);
+    }, [resource]);
     const contentClassName = useCallback((item?: ProblemItem) => {
         if (!item || !item.result) return '';
 
@@ -266,7 +266,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                 </div>
             }
         </>;
-    }, [resource]);
+    }, [resource, contentClassName]);
 
     return <Table
         dataSource={dataSource}
