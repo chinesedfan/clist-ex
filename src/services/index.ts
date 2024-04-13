@@ -73,11 +73,14 @@ export async function loadContestList(resource: string) {
         if (!fetchedContests.length) break;
 
         for (const c of fetchedContests) {
-            if (cacheContestIds.indexOf(c.id) < 0) {
-                fetchedCount++;
+            fetchedCount++;
+            const index = cacheContestIds.indexOf(c.id);
+            if (index >= 0) {
+                cacheContests[index] = c;
+            } else {
                 cacheContests.push(c);
-                saveData(db, storeName, c);
             }
+            saveData(db, storeName, c);
         }
         params.offset += PAGE_SIZE;
     }
