@@ -21,6 +21,10 @@ td.problem-cell {
     }
 }
 
+.rating-legendary::first-letter {
+    color: black;
+}
+
 .contest-statistics {
     position: absolute;
     bottom: 10px;
