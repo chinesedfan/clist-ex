@@ -1,12 +1,13 @@
 import React, { ContextType, useCallback, useState } from 'react';
-import { Alert, Tabs } from 'antd';
+import { Alert, Tabs, notification } from 'antd';
 import type { RadioChangeEvent, TabsProps } from 'antd';
-import { R_CC, R_LC, getAccountByHandle } from '../apis';
+import { R_CC, R_LC, getAccountsByHandle } from '../apis';
 import { ProblemFilter } from '../components/ProblemFilter';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
 import { ProblemList } from './ProblemList';
 import Account from '../types/Account';
 import { LOCAL_ACCOUNTS, LOCAL_HIDE_ALERT_RETRY, loadLocalObject, saveLocalObject } from '../services/localstorage';
+import { AccountPicker } from '../components/AccountPicker';
 
 const items: TabsProps['items'] = [
     {
@@ -39,19 +40,34 @@ export const ProblemPage: React.FC = () => {
     const [resource, setResource] = useState<string>(R_LC);
     const [account, setAccount] = useState<Account | undefined>(() => loadLocalObject(LOCAL_ACCOUNTS, resource));
     const [eventKeyword, setEventKeyword] = useState<string>('');
+    const [openAccountPicker, setOpenAccountPicker] = useState(false);
+    const [accounts, setAccounts] = useState<Account[]>([]);
+
+    function updateAccount(account: Account) {
+        const obj = loadLocalObject(LOCAL_ACCOUNTS) || {};
+        saveLocalObject(LOCAL_ACCOUNTS, {
+            ...obj,
+            [resource]: account,
+        });
+        setAccount(account);
+    }
 
     const contextValue: ContextType<typeof ProblemFilterContext> = {
         onSearch: async (handle, setLoading) => {
             if (!handle) return;
     
             setLoading(true);
-            const account = await getAccountByHandle(resource, handle);
-            const obj = loadLocalObject(LOCAL_ACCOUNTS) || {};
-            saveLocalObject(LOCAL_ACCOUNTS, {
-                ...obj,
-                [resource]: account,
-            });
-            setAccount(account);
+            const accounts = await getAccountsByHandle(resource, handle);
+            if (accounts.length > 1) {
+                setAccounts(accounts);
+                setOpenAccountPicker(true);
+            } else if (accounts.length === 1) {
+                updateAccount(accounts[0]);
+            } else {
+                notification.error({
+                    message: 'Not found any accounts.',
+                });
+            }
             setLoading(false);
         },
         onRadioChange: (e: RadioChangeEvent) => {
@@ -64,6 +80,10 @@ export const ProblemPage: React.FC = () => {
         setAccount(loadLocalObject(LOCAL_ACCOUNTS, activeKey));
         setEventKeyword('');
     }, []);
+    const onAccountPicked = useCallback((account: Account) => {
+        updateAccount(account);
+        setOpenAccountPicker(false);
+    }, [updateAccount]);
 
     const hideAlertRetry = localStorage.getItem(LOCAL_HIDE_ALERT_RETRY);
 
@@ -73,6 +93,8 @@ export const ProblemPage: React.FC = () => {
             <ProblemFilterContext.Provider value={contextValue}>
                 <Tabs items={items} destroyInactiveTabPane onChange={onTabChange} style={{ marginBottom: '16px' }}></Tabs>
             </ProblemFilterContext.Provider>
+            <AccountPicker open={openAccountPicker} accounts={accounts}
+                onAccountPicked={onAccountPicked} onModalCancel={() => setOpenAccountPicker(false)}></AccountPicker> 
             <ProblemList resource={resource} account={account} eventKeyword={eventKeyword} />
         </div>
     );

@@ -24,7 +24,8 @@ export const ProblemFilter: React.FC<Props> = props => {
 
     return (<Row justify="space-between">
         <Col span={4}>
-            <Search placeholder="handle" onSearch={(key) => onSearch!(key, setLoading)} loading={loading} defaultValue={defaultValue}></Search>
+            <Search placeholder="handle" defaultValue={defaultValue} key={defaultValue}
+                onSearch={(key) => onSearch!(key, setLoading)} loading={loading}></Search>
         </Col>
         <Radio.Group defaultValue={''} onChange={onRadioChange}>
             { props.radios.map(item => (
