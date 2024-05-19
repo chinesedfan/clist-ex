@@ -42,6 +42,7 @@ export const ProblemList: React.FC<Props> = (props) => {
 
     const prevResourceRef = useRef<string>();
     const prevEventKeywordRef = useRef<string>();
+    const prevAccountRef = useRef<Account>();
     const contestMapRef = useRef<Record<string, RowData>>({});
     const contestIdsRef = useRef<number[]>([]);
 
@@ -142,11 +143,31 @@ export const ProblemList: React.FC<Props> = (props) => {
             contestItem.n_problems_upsolved = upsolvedCount;
         }
     }
+    function clearStatistics() {
+        const contestMap = contestMapRef.current;
+        for (const contestId in contestMap) {
+            const rowData = contestMap[contestId];
+            const contestItem = rowData.contest;
+            delete contestItem.place;
+            delete contestItem.new_rating;
+            delete contestItem.rating_change;
+            delete contestItem.n_problems_solved;
+            delete contestItem.n_problems_upsolved;
+            for (const key in rowData) {
+                delete rowData[key].result;
+            }
+        }
+    }
+
     useEffect(() => {
         (async function() {
             const resourceChanged = resource !== prevResourceRef.current;
             const eventKeywordChanged = eventKeyword !== prevEventKeywordRef.current;
+            const accountChanged = account?.id !== prevAccountRef.current?.id;
             setLoading(true);
+            if (accountChanged) {
+                clearStatistics();
+            }
             if (resourceChanged || eventKeywordChanged) {
                 await updateContestsData();
             }
