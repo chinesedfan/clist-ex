@@ -43,7 +43,7 @@ export const SettingsPage: React.FC<any> = (props) => {
             <Button type="primary" onClick={onBtnSaveKeyClicked}>Save</Button>
         </Space.Compact>
         <Title level={3}>Contests Cache</Title>
-        <p>By default, contests will only be loaded in every 2 days, and a timestamp is saved in local storage. If failed or want to reload immediately, click following buttons.</p>
+        <p>By default, contests will only be loaded in every single day, and a timestamp is saved in local storage. If failed or want to reload immediately, click following buttons.</p>
         <Flex>
             <Button type="primary" onClick={() => onBtnResetLockClicked(STORE_LC)}>LeetCode Contests</Button>
             <Button type="primary" onClick={() => onBtnResetLockClicked(STORE_CC)} style={{ marginLeft: '20px' }}>CodeChef Contests</Button>
