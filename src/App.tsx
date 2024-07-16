@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import './App.css';
 import logo from './logo512.png';
-import {ConfigProvider, theme, Button, Card, Layout, Menu } from 'antd';
+import { ConfigProvider, theme, Button, Card, Layout, Menu } from 'antd';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { ProblemPage } from './pages/ProblemPage';
 import { AboutPage } from './pages/AboutPage';
