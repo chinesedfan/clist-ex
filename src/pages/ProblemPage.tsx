@@ -18,7 +18,7 @@ const items: TabsProps['items'] = [
                 { label: 'All', value: '' },
                 { label: 'Weekly', value: 'Weekly' },
                 { label: 'Biweekly', value: 'Biweekly' },
-            ]}> </ProblemFilter>        
+            ]}></ProblemFilter>        
         ),
     },
     {
