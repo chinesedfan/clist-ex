@@ -18,24 +18,69 @@ const items: TabsProps['items'] = [
                 { label: 'All', value: '' },
                 { label: 'Weekly', value: 'Weekly' },
                 { label: 'Biweekly', value: 'Biweekly' },
-            ]}></ProblemFilter>        
+            ]}> </ProblemFilter>        
         ),
     },
     {
         key: R_CC,
         label: 'CodeChef',
         children: (
-            <ProblemFilter radios={[
-                { label: 'All', value: '' },
-                { label: 'Rated for All', value: 'All' },
-                { label: 'Rated till 6-stars', value: '6.[Ss]tars' },
-                { label: 'Rated till 5-stars', value: '5.[Ss]tars' },
-                { label: 'Rated for Divs 2, 3 & 4', value: 'Divs 2' },
-            ]}></ProblemFilter>        
+            <div style={{ position: 'relative', padding: '20px' }}>
+                <ProblemFilter radios={[
+                    { label: 'All', value: '' },
+                    { label: 'Rated for All', value: 'All' },
+                    { label: 'Rated till 6-stars', value: '6.[Ss]tars' },
+                    { label: 'Rated till 5-stars', value: '5.[Ss]tars' },
+                    { label: 'Rated for Divs 2, 3 & 4', value: 'Divs 2' },
+                ]}></ProblemFilter>
+                <div style={{
+                        position: 'absolute',
+                        top: '-12px',
+                        right: '15px',
+                        padding: '8px',
+                        borderRadius: '4px', 
+                        width: '300px',
+                        display : "flex",
+                        flexWrap : "wrap",
+                        overflowX: 'auto', // Adds horizontal scroll if needed
+                        //whiteSpace: 'nowrap', // Ensures content stays in a single line if necessary
+                        //backgroundColor : 'red', 
+                }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' ,tableLayout: 'fixed'}}>
+                        <tbody>
+                            <tr>
+                                <td style={{ padding: '0 5px', textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <span style={{ width: '20px', height: '5px', backgroundColor: 'red', marginRight: '5px' }}></span>
+                                        <span >Div 1</span>
+                                    </div>
+                                </td>
+                                <td style={{ padding: '0 5px', textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <span style={{ width: '20px', height: '5px', backgroundColor: 'orange', marginRight: '5px' }}></span>
+                                        <span >Div 2</span>
+                                    </div>
+                                </td>
+                                <td style={{ padding: '0 5px', textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <span style={{ width: '20px', height: '5px', backgroundColor: '#40826D', marginRight: '5px' }}></span>
+                                        <span >Div 3</span>
+                                    </div>
+                                </td>
+                                <td style={{ padding: '0 5px', textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <span style={{ width: '20px', height: '5px', backgroundColor: 'grey', marginRight: '5px' }}></span>
+                                        <span>Div 4</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         ),
     },
 ];
-
 export const ProblemPage: React.FC = () => {
     const [resource, setResource] = useState<string>(R_LC);
     const [account, setAccount] = useState<Account | undefined>(() => loadLocalObject(LOCAL_ACCOUNTS, resource));
