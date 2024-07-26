@@ -111,3 +111,34 @@ td.problem-cell {
 .problem-div-4 {
     background: grey;
 }
+.legend-container {
+    position: absolute;
+    top: -12px;
+    right: 15px;
+    padding: 8px;
+    border-radius: 4px;
+    width: 300px;
+  }
+  
+  .legend-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  
+  .legend-cell {
+    padding: 0 5px;
+    text-align: center;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .legend-color-box {
+    width: 20px;
+    height: 5px;
+    margin-right: 5px;
+  }
+  
