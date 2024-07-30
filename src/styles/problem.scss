@@ -119,26 +119,42 @@ td.problem-cell {
     border-radius: 4px;
     width: 300px;
   }
-  
   .div-heading-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
   }
-  
   .div-cell {
     padding: 0 5px;
     text-align: center;
   }
-  
   .div-item {
     display: flex;
     align-items: center;
   }
   
-  .div-color-box {
-    width: 20px;
-    height: 5px;
-    margin-right: 5px;
+  .div-color-box-1,
+  .div-color-box-2,
+  .div-color-box-3,
+  .div-color-box-4 {
+      width: 20px;
+      height: 5px;
+      margin-right: 5px;
   }
-  
+
+
+  .div-color-box-1 {
+      background: red;
+  }
+
+  .div-color-box-2 {
+      background: $orange;
+  }
+
+  .div-color-box-3 {
+      background: $cyan;
+  }
+
+  .div-color-box-4 {
+      background: grey;
+  }
