@@ -111,50 +111,45 @@ td.problem-cell {
 .problem-div-4 {
     background: grey;
 }
+
 .div-heading-container {
-    position: absolute;
-    top: -12px;
-    right: 15px;
-    padding: 8px;
-    border-radius: 4px;
+    display: flex;
+    justify-content: flex-end;
+}
+.div-heading-table {
     width: 300px;
-  }
-  .div-heading-table {
-    width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
   }
-  .div-cell {
-    padding: 0 5px;
+.div-cell {
+    padding-bottom: 5px;
     text-align: center;
-  }
-  .div-item {
+}
+.div-item {
     display: flex;
     align-items: center;
-  }
-  
-  .div-color-box-1,
-  .div-color-box-2,
-  .div-color-box-3,
-  .div-color-box-4 {
-      width: 20px;
-      height: 5px;
-      margin-right: 5px;
-  }
+}
 
+.div-color-box-1,
+.div-color-box-2,
+.div-color-box-3,
+.div-color-box-4 {
+    width: 20px;
+    height: 5px;
+    margin-right: 5px;
+}
+.div-color-box-1 {
+    background: red;
+}
 
-  .div-color-box-1 {
-      background: red;
-  }
+.div-color-box-2 {
+    background: $orange;
+}
 
-  .div-color-box-2 {
-      background: $orange;
-  }
+.div-color-box-3 {
+    background: $cyan;
+}
 
-  .div-color-box-3 {
-      background: $cyan;
-  }
-
-  .div-color-box-4 {
-      background: grey;
-  }
+.div-color-box-4 {
+    background: grey;
+}

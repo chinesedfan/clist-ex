@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LegendComponent = () => (
+export const LegendComponent = React.memo(() => (
     <div className="div-heading-container">
         <table className="div-heading-table">
             <tbody>
@@ -17,8 +17,4 @@ const LegendComponent = () => (
             </tbody>
         </table>
     </div>
-);
-
-export default React.memo(LegendComponent);
-
-  
+));
