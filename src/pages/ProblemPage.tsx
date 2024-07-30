@@ -8,6 +8,8 @@ import { ProblemList } from './ProblemList';
 import Account from '../types/Account';
 import { LOCAL_ACCOUNTS, LOCAL_HIDE_ALERT_RETRY, loadLocalObject, saveLocalObject } from '../services/localstorage';
 import { AccountPicker } from '../components/AccountPicker';
+import { LegendComponent } from '../components/LegendComponent';
+
 
 const items: TabsProps['items'] = [
     {
@@ -25,13 +27,16 @@ const items: TabsProps['items'] = [
         key: R_CC,
         label: 'CodeChef',
         children: (
-            <ProblemFilter radios={[
-                { label: 'All', value: '' },
-                { label: 'Rated for All', value: 'All' },
-                { label: 'Rated till 6-stars', value: '6.[Ss]tars' },
-                { label: 'Rated till 5-stars', value: '5.[Ss]tars' },
-                { label: 'Rated for Divs 2, 3 & 4', value: 'Divs 2' },
-            ]}></ProblemFilter>        
+            <div style={{ position: 'relative' }}>
+                <LegendComponent />
+                <ProblemFilter radios={[
+                    { label: 'All', value: '' },
+                    { label: 'Rated for All', value: 'All' },
+                    { label: 'Rated till 6-stars', value: '6.[Ss]tars' },
+                    { label: 'Rated till 5-stars', value: '5.[Ss]tars' },
+                    { label: 'Rated for Divs 2, 3 & 4', value: 'Divs 2' },
+                ]}></ProblemFilter>
+            </div>
         ),
     },
 ];
