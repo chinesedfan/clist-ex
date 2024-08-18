@@ -24,6 +24,7 @@ export type CCContest = Contest<{
 }>;
 
 export interface ContestProblem {
+    id: number;
     code: string | number;
     n_accepted: number;
     n_teams: number;

@@ -273,7 +273,7 @@ export const ProblemList: React.FC<Props> = (props) => {
                 <Tooltip title={"Rating: " + problem.rating}>
                     <span className={'difficult-circle ' + color} style={circleStyle}></span>
                 </Tooltip>
-                <a className="problem-link" style={spanStyle} href={problem.url} target="_blank">{isCCContestProblem(problem) ? problem.short : problem.name}</a>
+                <a className="problem-link" style={spanStyle} href={problem.url} target="_blank">{isCCContestProblem(problem) ? problem.short : problem.id + '. ' + problem.name}</a>
             </Flex>
             { !!result && 
                 <div className="problem-statistics">
