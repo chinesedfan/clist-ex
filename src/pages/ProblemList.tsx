@@ -52,6 +52,7 @@ export const ProblemList: React.FC<Props> = (props) => {
     const [pagination, setPagination] = useState<TablePaginationConfig>({
         current: 1,
         pageSize: 10,
+        showQuickJumper: true,
     });
     const [loading, setLoading] = useState(false);
 
