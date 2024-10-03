@@ -1,6 +1,7 @@
-import React, { ContextType, useCallback, useState } from 'react';
-import { Alert, Tabs, notification } from 'antd';
+import React, { ContextType, useCallback, useRef, useState } from 'react';
+import { Alert, Button, Tabs, notification } from 'antd';
 import type { RadioChangeEvent, TabsProps } from 'antd';
+import { SyncOutlined } from '@ant-design/icons'
 import { R_CC, R_LC, getAccountsByHandle } from '../apis';
 import { ProblemFilter } from '../components/ProblemFilter';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
@@ -47,6 +48,7 @@ export const ProblemPage: React.FC = () => {
     const [eventKeyword, setEventKeyword] = useState<string>('');
     const [openAccountPicker, setOpenAccountPicker] = useState(false);
     const [accounts, setAccounts] = useState<Account[]>([]);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     function updateAccount(account: Account) {
         const obj = loadLocalObject(LOCAL_ACCOUNTS) || {};
@@ -85,6 +87,9 @@ export const ProblemPage: React.FC = () => {
         setAccount(loadLocalObject(LOCAL_ACCOUNTS, activeKey));
         setEventKeyword('');
     }, []);
+    const onSyncClicked = useCallback(() => {
+        setRefreshKey(refreshKey + 1);
+    }, [refreshKey]);
     const onAccountPicked = useCallback((account: Account) => {
         updateAccount(account);
         setOpenAccountPicker(false);
@@ -96,11 +101,17 @@ export const ProblemPage: React.FC = () => {
         <div>
             { !hideAlertRetry && <Alert message="It may cost more time when loading contests at the first time. If failed, please switch LeetCode/CodeChef tabs to retry. To prevent hitting the request rate limit, you can go to the Settings tab to set another API key." type="info" showIcon closable onClose={() => localStorage.setItem(LOCAL_HIDE_ALERT_RETRY, '1')} />}
             <ProblemFilterContext.Provider value={contextValue}>
-                <Tabs items={items} destroyInactiveTabPane onChange={onTabChange} style={{ marginBottom: '16px' }}></Tabs>
+                <div style={{ position: 'relative' }}>
+                    <Tabs items={items} destroyInactiveTabPane onChange={onTabChange} style={{ marginBottom: '16px' }}></Tabs>
+                    <Button type="primary" onClick={onSyncClicked} className="btn-sync">
+                        <SyncOutlined /> 
+                    </Button>
+                </div>
             </ProblemFilterContext.Provider>
             <AccountPicker open={openAccountPicker} accounts={accounts}
                 onAccountPicked={onAccountPicked} onModalCancel={() => setOpenAccountPicker(false)}></AccountPicker> 
-            <ProblemList resource={resource} account={account} eventKeyword={eventKeyword} />
+            <ProblemList refreshKey={refreshKey}
+                resource={resource} account={account} eventKeyword={eventKeyword} />
         </div>
     );
 }

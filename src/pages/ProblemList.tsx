@@ -16,6 +16,7 @@ interface Props {
     resource: string;
     account?: Account;
     eventKeyword: string;
+    refreshKey: number;
 }
 type RowData = {
     contest: ContestItem;
@@ -38,7 +39,7 @@ interface ProblemItem {
 }
 
 export const ProblemList: React.FC<Props> = (props) => {
-    const { resource, account, eventKeyword } = props;
+    const { resource, account, eventKeyword, refreshKey } = props;
 
     const prevResourceRef = useRef<string>();
     const prevEventKeywordRef = useRef<string>();
@@ -181,6 +182,9 @@ export const ProblemList: React.FC<Props> = (props) => {
             prevEventKeywordRef.current = eventKeyword;
         })();
     }, [resource, account, eventKeyword]);
+    useEffect(() => {
+        onTableChange(pagination);
+    }, [refreshKey]);
 
     const onTableChange = useCallback((pagination: TablePaginationConfig) => {
         (async function() {
