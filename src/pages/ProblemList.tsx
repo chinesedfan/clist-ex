@@ -8,6 +8,7 @@ import { ReactComponent as IconDown } from '../styles/anticon-down.svg';
 import { R_CC, R_LC } from '../apis';
 import { CCContest, CCContestProblem, CCDiv, ContestProblem, LCContest, isCCContestProblem } from '../types/Contest';
 import { loadContestList, loadStatistics } from '../services';
+import { LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, useLocalStorage } from '../services/localstorage';
 import Account from '../types/Account';
 
 const { Column } = Table;
@@ -55,6 +56,9 @@ export const ProblemList: React.FC<Props> = (props) => {
         showQuickJumper: true,
     });
     const [loading, setLoading] = useState(false);
+    const [strategy, setStrategy] = useLocalStorage(LOCAL_STATISTICS_STRATEGY, StatisticsStrategy.CacheFirstIfNonEmpty, {
+        raw: true,
+    });
 
     async function updateContestsData() {
         const contests = await loadContestList(resource);
@@ -184,7 +188,16 @@ export const ProblemList: React.FC<Props> = (props) => {
         })();
     }, [resource, account, eventKeyword]);
     useEffect(() => {
-        onTableChange(pagination);
+        if (!refreshKey) return; // first render
+
+        (async function() {
+            setLoading(true);
+            setStrategy(StatisticsStrategy.NetworkFirst);
+            await updateStatistics(pagination);
+            setStrategy(strategy);
+            setPagination(pagination);
+            setLoading(false);
+        })();
     }, [refreshKey]);
 
     const onTableChange = useCallback((pagination: TablePaginationConfig) => {
