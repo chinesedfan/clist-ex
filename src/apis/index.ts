@@ -50,11 +50,11 @@ function extractList<T>(p: Promise<AxiosResponse<ListResponse<T>> | undefined>) 
     });
 }
 
-export function getAccountsByHandle(resource: string, handle__regex: string) {
+export function getAccountsByHandle(resource: string, handle__startswith: string) {
     return extractList(client.get<ListResponse<Account>>('/account/', {
         params: {
             resource,
-            handle__regex,
+            handle__startswith,
             limit: 5,
         },
     }));
