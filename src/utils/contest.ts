@@ -25,9 +25,7 @@ export type RowData = {
 export function buildContestMap(contests: Contest<any>[], resource: string, eventKeyword: string): {
     contestMap: Record<string, RowData>;
     contestIds: number[];
-    maxProblemCount: number;
 } {
-    let maxProblemCount = 4;
     const contestIds: number[] = [];
     const contestMap = contests.reduce((o, c) => {
         if (!c.problems || !(new RegExp(eventKeyword)).test(c.event)) return o;
@@ -69,13 +67,12 @@ export function buildContestMap(contests: Contest<any>[], resource: string, even
                     problem: problemMap[short],
                 };
             }
-            maxProblemCount = Math.max(maxProblemCount, index);
         }
         
         return o;
     }, {} as Record<string, RowData>);
 
-    return { contestMap, contestIds, maxProblemCount };
+    return { contestMap, contestIds };
 }
 
 export function updateContestMapWithStatistics(
@@ -117,6 +114,15 @@ export function clearStatisticsFromContestMap(contestMap: Record<string, RowData
             delete rowData[key].result;
         }
     }
+}
+
+export function getMaxProblemCount(contestMap: Record<string, RowData>, contestids: number[]): number {
+    let maxProblemCount = 4;
+    for (const contestId of contestids) {
+        const rowData = contestMap[contestId];
+        maxProblemCount = Math.max(maxProblemCount, rowData.contest.n_problems);
+    }
+    return maxProblemCount;
 }
 
 /**

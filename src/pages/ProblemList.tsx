@@ -12,7 +12,8 @@ import {
     RowData, 
     buildContestMap, 
     updateContestMapWithStatistics, 
-    clearStatisticsFromContestMap 
+    clearStatisticsFromContestMap, 
+    getMaxProblemCount
 } from '../utils/contest';
 
 const { Column } = Table;
@@ -49,11 +50,10 @@ export const ProblemList: React.FC<Props> = (props) => {
         const contests = await loadContestList(resource);
         if (!contests) return;
 
-        const { contestMap, contestIds, maxProblemCount } = buildContestMap(contests, resource, eventKeyword);
+        const { contestMap, contestIds } = buildContestMap(contests, resource, eventKeyword);
         contestMapRef.current = contestMap;
         contestIdsRef.current = contestIds;
 
-        setMaxProblemCount(maxProblemCount);
         setPagination(pagination => ({
             ...pagination,
             current: 1,
@@ -61,13 +61,16 @@ export const ProblemList: React.FC<Props> = (props) => {
     }
     async function updateStatistics(pagination: TablePaginationConfig) {
         const contestIds = contestIdsRef.current;
-        if (!account || !contestIds.length) return;
+        if (!contestIds.length) return;
 
         const { current, pageSize } = pagination;
         const startIndex = (current! - 1) * pageSize!;
-        const statistics = await loadStatistics(account.id,
-            contestIds.slice(startIndex, startIndex + pageSize!));
-        updateContestMapWithStatistics(contestMapRef.current, statistics);
+        const currentContestIds = contestIds.slice(startIndex, startIndex + pageSize!);
+        setMaxProblemCount(getMaxProblemCount(contestMapRef.current, currentContestIds));
+        if (account) {
+            const statistics = await loadStatistics(account.id, currentContestIds);
+            updateContestMapWithStatistics(contestMapRef.current, statistics);
+        }
     }
 
     useEffect(() => {
