@@ -5,6 +5,7 @@ const EXPIRE_LIMIT_MS = 24 * 3600 * 1000; // 1 day
 export const LOCAL_HIDE_ALERT_RETRY = 'local-hide-alert-retry';
 export const LOCAL_ACCOUNTS = 'local-accounts';
 export const LOCAL_CLIST_APIKEY = 'local-clist-apikey';
+export const LOCAL_LEETCODE_COOKIE = 'local-leetcode-cookie';
 export const LOCAL_STATISTICS_STRATEGY = 'local-statistics-strategy';
 
 export enum StatisticsStrategy {

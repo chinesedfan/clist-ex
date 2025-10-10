@@ -1,7 +1,7 @@
 import { R_LC } from "../apis";
 
 const LC_RATINGS = [0, 1200, 1400, 1600, 1900, 2100, 2400, 3000];
-const LC_COLORS = [
+export const LC_COLORS = [
     'gray', 'green', '#03a89e' /* cyan */, 'blue', '#a0a' /* violet */,
     '#ff8c00' /* orange */, 'red'
 ];

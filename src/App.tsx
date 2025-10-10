@@ -4,6 +4,7 @@ import logo from './logo512.png';
 import { ConfigProvider, theme, Button, Card, Layout, Menu } from 'antd';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { ContestPage } from './pages/ContestPage';
+import { ProblemPage } from './pages/ProblemPage';
 import { AboutPage } from './pages/AboutPage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -26,12 +27,13 @@ function App() {
             <img src={logo} style={{ height: '40px' }} alt="Extensions based on clist.by" />
             <div style={{ flex: 1, padding: '0 10px', color: 'white', fontSize: 20, fontWeight: 'bold' }}>clist-ex</div>
             <Menu
-                style={{ width: '350px' }}
+                style={{ width: '420px' }}
                 theme="dark"
                 mode="horizontal"
                 defaultSelectedKeys={[current]}
                 items={[
                     { key: 'contests', label: 'Contests' },
+                    { key: 'problems', label: 'Problems' },
                     { key: 'github', label: <a href="https://github.com/chinesedfan/clist-ex" target="_blank">Github</a> },
                     { key: 'settings', label: 'Settings' },
                     { key: 'about', label: 'About' },
@@ -45,6 +47,7 @@ function App() {
         <Content style={{ padding: '30px 48px' }}>
             <Card>
                 { current === 'contests' && <ContestPage></ContestPage> }
+                { current === 'problems' && <ProblemPage></ProblemPage> }
                 { current === 'settings' && <SettingsPage></SettingsPage> }
                 { current === 'about' && <AboutPage></AboutPage> }
             </Card>
