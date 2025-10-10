@@ -25,7 +25,7 @@ interface Props {
     refreshKey: number;
 }
 
-export const ProblemList: React.FC<Props> = (props) => {
+export const ContestList: React.FC<Props> = (props) => {
     const { resource, account, eventKeyword, refreshKey } = props;
 
     const prevResourceRef = useRef<string>();

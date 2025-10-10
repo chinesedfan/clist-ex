@@ -5,7 +5,7 @@ import { SyncOutlined } from '@ant-design/icons'
 import { R_CC, R_LC, getAccountsByHandle } from '../apis';
 import { ProblemFilter } from '../components/ProblemFilter';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
-import { ProblemList } from './ProblemList';
+import { ContestList } from './ContestList';
 import Account from '../types/Account';
 import { LOCAL_ACCOUNTS, LOCAL_HIDE_ALERT_RETRY, loadLocalObject, saveLocalObject } from '../services/localstorage';
 import { AccountPicker } from '../components/AccountPicker';
@@ -42,7 +42,7 @@ const items: TabsProps['items'] = [
     },
 ];
 
-export const ProblemPage: React.FC = () => {
+export const ContestPage: React.FC = () => {
     const [resource, setResource] = useState<string>(R_LC);
     const [account, setAccount] = useState<Account | undefined>(() => loadLocalObject(LOCAL_ACCOUNTS, resource));
     const [eventKeyword, setEventKeyword] = useState<string>('');
@@ -110,7 +110,7 @@ export const ProblemPage: React.FC = () => {
             </ProblemFilterContext.Provider>
             <AccountPicker open={openAccountPicker} accounts={accounts}
                 onAccountPicked={onAccountPicked} onModalCancel={() => setOpenAccountPicker(false)}></AccountPicker> 
-            <ProblemList refreshKey={refreshKey}
+            <ContestList refreshKey={refreshKey}
                 resource={resource} account={account} eventKeyword={eventKeyword} />
         </div>
     );

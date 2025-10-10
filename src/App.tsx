@@ -3,7 +3,7 @@ import './App.css';
 import logo from './logo512.png';
 import { ConfigProvider, theme, Button, Card, Layout, Menu } from 'antd';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
-import { ProblemPage } from './pages/ProblemPage';
+import { ContestPage } from './pages/ContestPage';
 import { AboutPage } from './pages/AboutPage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -12,7 +12,7 @@ const { Header, Content, Footer } = Layout
 function App() {
     const { defaultAlgorithm, darkAlgorithm } = theme;
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [current, setCurrent] = useState('problems')
+    const [current, setCurrent] = useState('contests')
     const onMenuClick = useCallback((e: any) => {
         setCurrent(e.key);
     }, [])
@@ -29,8 +29,9 @@ function App() {
                 style={{ width: '350px' }}
                 theme="dark"
                 mode="horizontal"
+                defaultSelectedKeys={[current]}
                 items={[
-                    { key: 'problems', label: 'Problems' },
+                    { key: 'contests', label: 'Contests' },
                     { key: 'github', label: <a href="https://github.com/chinesedfan/clist-ex" target="_blank">Github</a> },
                     { key: 'settings', label: 'Settings' },
                     { key: 'about', label: 'About' },
@@ -43,7 +44,7 @@ function App() {
         </Header>
         <Content style={{ padding: '30px 48px' }}>
             <Card>
-                { current === 'problems' && <ProblemPage></ProblemPage> }
+                { current === 'contests' && <ContestPage></ContestPage> }
                 { current === 'settings' && <SettingsPage></SettingsPage> }
                 { current === 'about' && <AboutPage></AboutPage> }
             </Card>
