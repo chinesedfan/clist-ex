@@ -3,9 +3,10 @@ import Contest from "../types/Contest";
 import Statistics from "../types/Statistics";
 import { getAlignedOffset } from "../utils/pagination";
 import { loadAllData, openDatabase, saveData } from "./db";
-import { LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, isCacheExpired, touchCache } from "./localstorage";
+import { LOCAL_LEETCODE_COOKIE, LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, isCacheExpired, touchCache } from "./localstorage";
 import { log } from "../utils/log";
 import { notification } from "antd";
+import { fetchLeetCodeProblems, LCRawProblem } from "../apis/leetcode";
 
 const PAGE_SIZE = 200;
 const DB_NAME = 'clist-ex';
@@ -148,4 +149,31 @@ export async function loadStatistics(account_id: number, contestIds: number[]) {
         }
     }
     return Object.keys(statisticsMap).map(cid => statisticsMap[cid as any]);
+}
+
+export async function loadLeetCodeProblems() {
+    const storeName = 'lc-problems';
+    const cookie = localStorage.getItem(LOCAL_LEETCODE_COOKIE) || '';
+    if (!cookie) return [];
+
+    const userName = cookie.split('=').slice(-1)[0];
+    const db = await openDatabase(`leetcode-${userName}`, async (db) => {
+        await createObjectStorePromise(db, storeName, {
+            keyPath: 'questionFrontendId',
+        });
+    });
+    if (!isCacheExpired(storeName)) {
+        const cacheProblems = await loadAllData<LCRawProblem[]>(db, storeName);
+        return cacheProblems;
+    }
+
+    const fetchedProblems = await fetchLeetCodeProblems();
+    for (const p of fetchedProblems) {
+        saveData(db, storeName, p);
+    }
+    if (fetchedProblems.length) {
+        touchCache(storeName);
+    }
+    log(`[service] loadLeetCodeProblems: fetchedCount=${fetchedProblems.length}.`);
+    return fetchedProblems;
 }

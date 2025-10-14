@@ -31,6 +31,8 @@ We save cache data in browser's IndexedDB, with fixed ObjectStore names.
     - store: contest-cc
 - db: statistics-<account_id>
     - store: statistics
+- db: leetcode-<user_name>
+    - store: lc-problems
 
 ## Similar Repository
 

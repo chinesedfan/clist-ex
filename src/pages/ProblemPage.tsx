@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Flex, Progress } from 'antd';
 import { LC_COLORS } from '../utils/rating';
-import { fetchLeetCodeProblems } from '../apis/leetcode';
+import { loadLeetCodeProblems } from '../services';
 
 export const ProblemPage: React.FC = () => {
     useEffect(() => {
-        fetchLeetCodeProblems();
+        loadLeetCodeProblems();
     }, []);
     return (
         <Flex wrap='wrap' gap={'20px'}>
