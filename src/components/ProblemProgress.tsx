@@ -5,14 +5,16 @@ import { getRatingColor } from '../utils/rating';
 import { R_LC } from '../apis';
 import '../styles/problem-progress.scss';
 
+export interface ProblemProgressItem {
+    total: number;
+    solved: number;
+    attempted: number;
+    rating: number;
+    range?: number;
+}
+
 interface Props {
-    item: {
-        total: number;
-        solved: number;
-        attempted: number;
-        rating: number;
-        range?: number;
-    };
+    item: ProblemProgressItem;
 }
 
 function calPercent(total: number, current: number): number {
