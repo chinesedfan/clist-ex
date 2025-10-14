@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Table, TablePaginationConfig } from 'antd';
-import '../styles/problem.scss';
+import '../styles/contest-list.scss';
 import { loadContestList, loadStatistics } from '../services';
 import { LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, useLocalStorage } from '../services/localstorage';
 import Account from '../types/Account';
-import { ContestItem } from '../components/ContestItem';
-import { ProblemItem } from '../components/ProblemItem';
+import { ContestItem } from './ContestItem';
+import { ProblemItem } from './ProblemItem';
 import { 
     ContestItemData, 
     ProblemItemData, 

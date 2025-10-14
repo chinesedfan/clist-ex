@@ -76,8 +76,9 @@ export const SinglePieChart: React.FC<Props> = ({ data, hideLegend }) => {
 
   return (
     <div>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={200}>
         <PieChart>
+          {/* @ts-ignore */}
           <Pie
             activeIndex={activeIndex}
             activeShape={RenderActiveShape}

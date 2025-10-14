@@ -1,0 +1,17 @@
+/* https://github.com/kenkoooo/AtCoderProblems */
+.pie-chart-summary text {
+  fill: #212529;
+  text-anchor: middle;
+  font-size: unquote("min(1.3vw, 15px)");
+}
+
+/* bootstrap/scss */
+.text-muted { color: #6c757d !important; }
+h5, h6 {
+    text-align: center;
+    font-size: 1.25em;
+    margin-top: 0;
+    margin-bottom: .5rem;
+    font-weight: 500;
+    line-height: 1.2;
+}

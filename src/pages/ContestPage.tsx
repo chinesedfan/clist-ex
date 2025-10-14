@@ -5,7 +5,7 @@ import { SyncOutlined } from '@ant-design/icons'
 import { R_CC, R_LC, getAccountsByHandle } from '../apis';
 import { ProblemFilter } from '../components/ProblemFilter';
 import { ProblemFilterContext } from '../components/ProblemFilterContext';
-import { ContestList } from './ContestList';
+import { ContestList } from '../components/ContestList';
 import Account from '../types/Account';
 import { LOCAL_ACCOUNTS, LOCAL_HIDE_ALERT_RETRY, loadLocalObject, saveLocalObject } from '../services/localstorage';
 import { AccountPicker } from '../components/AccountPicker';

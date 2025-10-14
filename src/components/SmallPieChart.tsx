@@ -1,6 +1,6 @@
 // https://github.com/kenkoooo/AtCoderProblems
 import React from "react";
-import { SinglePieChart } from "../../../components/SinglePieChart";
+import { SinglePieChart } from "./SinglePieChart";
 
 const COLORS = {
   Accepted: "#32cd32",
