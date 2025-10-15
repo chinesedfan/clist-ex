@@ -50,9 +50,9 @@ export const SettingsPage: React.FC<any> = (props) => {
             <Button type="primary" onClick={onBtnSaveKeyClicked}>Save</Button>
         </Space.Compact>
         <Title level={3}>LeetCode Cookie</Title>
-        <p>Set your LeetCode cookie to load accurate problem status from official websites, instead of clist.</p>
+        <p>Set your LeetCode cookie LEETCODE_SESSION to load accurate problem status from official websites, instead of clist.</p>
         <Flex>
-            <Input.TextArea placeholder={'1. open leetcode.com/cn.\n2. print document.cookie in console.\n3. copy and paste here.'} defaultValue={leetcodeCookie} onChange={(e) => setLeetCodeCookie(e.currentTarget.value)} rows={4} style={{ resize: 'none', width: '527px', marginRight: '10px' }}></Input.TextArea>
+            <Input.TextArea placeholder={'1. open leetcode.com/cn in browser.\n2. find cookie LEETCODE_SESSION in Application->Cookies.\n3. copy and paste here.'} defaultValue={leetcodeCookie} onChange={(e) => setLeetCodeCookie(e.currentTarget.value)} rows={4} style={{ resize: 'none', width: '527px', marginRight: '10px' }}></Input.TextArea>
             <Button type="primary" onClick={onBtnSaveCookieClicked}>Save</Button>
         </Flex>
         <Title level={3}>Contests Cache</Title>
