@@ -132,7 +132,7 @@ export const ContestList: React.FC<Props> = (props) => {
         pagination={pagination}
         loading={loading}
     >
-        <Column className="problem-cell" title="Contest" dataIndex="contest" render={contestItemRender} />
+        <Column className="contest-cell" title="Contest" dataIndex="contest" render={contestItemRender} />
         {
             Array(maxProblemCount)
                 .fill(0)

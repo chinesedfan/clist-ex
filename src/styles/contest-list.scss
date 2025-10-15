@@ -9,11 +9,11 @@ $orange: #ff8c00;
     top: 10px;
 }
 
-td.problem-cell {
+.contest-cell, .problem-cell {
     padding: 0 !important;
 
-    .problem-content {
-        height: 95px;
+    .contest-content, .problem-content {
+        height: 70px;
         padding: 0px 16px;
         &.solved {
             background-color: #9ad59e;
@@ -26,6 +26,13 @@ td.problem-cell {
         }
     }
 }
+.contest-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .rating-legendary::first-letter {
     color: black;
@@ -33,7 +40,7 @@ td.problem-cell {
 
 .contest-statistics {
     position: absolute;
-    bottom: 10px;
+    bottom: 0;
     left: 16px;
     right: 16px;
     z-index: 10;
@@ -85,7 +92,6 @@ td.problem-cell {
 
 .problem-statistics {
     position: absolute;
-    bottom: 10px;
     right: 10px;
 }
 .problem-time {
@@ -98,7 +104,7 @@ td.problem-cell {
 
 .problem-divisions {
     position: absolute;
-    top: 10px;
+    top: 0;
     left: 0;
     right: 0;
 }

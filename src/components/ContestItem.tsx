@@ -17,7 +17,7 @@ export const ContestItem: React.FC<Props> = ({ data, resource }) => {
         place, new_rating, rating_change
     } = data;
     // FIXME: lots of type assert
-    let className = 'problem-content';
+    let className = 'contest-content';
     if (n_problems_solved === n_problems) {
         className += ' solved';
     } else if (n_problems_solved! + n_problems_upsolved! === n_problems) {
@@ -42,13 +42,13 @@ export const ContestItem: React.FC<Props> = ({ data, resource }) => {
         </>;
     }
 
-    return <>
-        <Flex className={className} align="center">{data.event}</Flex>
+    return <Flex className={className} align="center">
+        <div className="contest-name">{data.event}</div>
         { n_problems_solved! > 0 && <Flex className={statisticsClassName} align="center">
             <div className={ratingClassName} style={{ fontWeight: 'bold', color: ratingColor, marginRight: '5px' }}>{new_rating || '-'}</div>
             { ratingChangeSegment }
             <div className="contest-place">rank {place}</div>
         </Flex>
         }
-    </>;
+    </Flex>;
 };

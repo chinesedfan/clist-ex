@@ -3,6 +3,7 @@ import { Flex, Typography } from 'antd';
 import { ProblemProgress, ProblemProgressItem } from '../components/ProblemProgress';
 import { loadLeetCodeProblems } from '../services';
 import { fetchLeetCodeRatings } from '../apis/leetcode';
+import { log } from '../utils/log';
 
 const { Title } = Typography;
 
@@ -31,8 +32,12 @@ export const ProblemPage: React.FC = () => {
 
             const currentData = defaultData
             const problems = await loadLeetCodeProblems();
+            let unknownCount = 0;
             problems.forEach(p => {
                 const rating = ratingsMap[p.questionFrontendId];
+                if (rating === undefined) {
+                    unknownCount++;
+                }
                 for (let i = currentData.length - 1; i >= 0; i--) {
                     const o = currentData[i]
                     if (rating >= o.rating) {
@@ -46,6 +51,7 @@ export const ProblemPage: React.FC = () => {
                     }
                 }
             });
+            log(`Unknown ratings count: ${unknownCount}`);
             setData(currentData);
         })();
     }, []);
