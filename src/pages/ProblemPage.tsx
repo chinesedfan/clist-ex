@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Flex, Typography } from 'antd';
+import { Alert, Flex, Typography } from 'antd';
 import { ProblemProgress, ProblemProgressItem } from '../components/ProblemProgress';
 import { loadLeetCodeProblems } from '../services';
 import { fetchLeetCodeRatings } from '../apis/leetcode';
@@ -22,6 +22,7 @@ const defaultData = [
 
 export const ProblemPage: React.FC = () => {
     const [data, setData] = useState<ProblemProgressItem[]>([]);
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         (async () => {
             const ratings = await fetchLeetCodeRatings();
@@ -53,11 +54,13 @@ export const ProblemPage: React.FC = () => {
             });
             log(`Unknown ratings count: ${unknownCount}`);
             setData(currentData);
+            setLoading(false);
         })();
     }, []);
 
     return (<>
         <Title level={3}>LeetCode Problems</Title>
+        { loading && <Alert message="Loading may take 1-2 mins (make sure you solved CORS problem and set LeetCode cookie in Settings page)..." type="info" showIcon /> }
         <Flex wrap='wrap' gap={'20px'}>
             { data.map((item, index) => (
                 <div key={index} style={{ width: 'calc(20% - 20px)' }}>

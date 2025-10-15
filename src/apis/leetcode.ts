@@ -1,11 +1,11 @@
 import { LeetCode, Credential, fetcher, ProblemList } from 'leetcode-query';
 import { log } from '../utils/log';
 import { jsonp } from '../utils/jsonp';
+import { notification } from 'antd';
 
-const LIMIT = 100;
+const LIMIT = 1000;
 const DELAY_MS = 1500;
 // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
-const PROXY_URL = 'https://cors-anywhere.com/';
 const GITHUB_DATA_URL = 'https://raw.githubusercontent.com/zerotrac/leetcode_problem_rating/main/data.json';
 
 export type LCRawProblem = ProblemList['questions'][0];
@@ -27,10 +27,13 @@ export async function fetchLeetCodeProblems() {
     const all: LCRawProblem[] = [];
 
     fetcher.set(async (...args) => {
-        args[0] = PROXY_URL + args[0];
+        // args[0] = PROXY_URL + args[0];
         const res = await fetch(...args);
         return new Response(res.body, res);
     })
+    // @ts-ignore
+    window.setImmediate = window.setTimeout; // stupid hack for leetcode-query
+
     const credential = new Credential();
     const cookie = localStorage.getItem('local-leetcode-cookie') || '';
     await credential.init(cookie);
@@ -39,14 +42,15 @@ export async function fetchLeetCodeProblems() {
         const res = await lc.problems({
             offset: skip,
             limit: LIMIT,
-            filters: { difficulty: "HARD" },
+            // filters: { difficulty: "HARD" },
         });
 
         if (total === null) total = res.total;
         all.push(...res.questions);
 
-        log(`...${all.length}/${total} leetcode problems fetched.`);
-break; // FIXME:
+        notification.info({
+            message: `...${all.length}/${total} problems fetched.`,
+        });
         if (all.length >= total) break;
 
         skip += LIMIT;
