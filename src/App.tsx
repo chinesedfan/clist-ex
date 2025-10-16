@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import './App.css';
 import logo from './logo512.png';
-import { ConfigProvider, theme, Button, Card, Layout, Menu } from 'antd';
+import { App as AndtdApp, ConfigProvider, theme, Button, Card, Layout, Menu } from 'antd';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { ContestPage } from './pages/ContestPage';
 import { ProblemPage } from './pages/ProblemPage';
@@ -21,6 +21,7 @@ function App() {
         setIsDarkMode((previousValue) => !previousValue);
     };
     return (
+    <AndtdApp>
     <ConfigProvider theme={{ algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm }}>
     <Layout style={{ minHeight: '100vh' }}>
         <Header style={{ display: 'flex', alignItems: 'center' }}>
@@ -57,6 +58,7 @@ function App() {
         </Footer>
     </Layout>
     </ConfigProvider>
+    </AndtdApp>
     );
 }
 

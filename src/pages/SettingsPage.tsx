@@ -1,4 +1,4 @@
-import { Button, Flex, Input, Radio, RadioChangeEvent, Space, Typography, notification } from "antd";
+import { Button, Flex, Input, Radio, RadioChangeEvent, Space, Typography, App } from "antd";
 import { useCallback, useState } from "react";
 import { STORE_CC, STORE_LC } from "../services";
 import { defaultSettings, LOCAL_SETTINGS, SettingsKey, StatisticsStrategy, useLocalStorage } from "../services/localstorage";
@@ -12,6 +12,7 @@ const strategyRadioItems = [
 ];
 
 export const SettingsPage: React.FC<any> = (props) => {
+    const { notification } = App.useApp();
     const [settings, setSettings] = useLocalStorage<Record<string, any> >(LOCAL_SETTINGS, defaultSettings);
 
     const [apiKey, setAPIKey] = useState(settings![SettingsKey.Apikey] || '');
