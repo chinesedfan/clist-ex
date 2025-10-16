@@ -5,7 +5,7 @@ import Account from "../types/Account";
 import Problem from "../types/Problem";
 import Statistics from "../types/Statistics";
 import Contest from "../types/Contest";
-import { LOCAL_CLIST_APIKEY } from "../services/localstorage";
+import { loadLocalObject, LOCAL_SETTINGS, SettingsKey } from "../services/localstorage";
 
 export const R_LC = 'leetcode.com';
 export const R_CC = 'codechef.com';
@@ -15,8 +15,9 @@ const client = axios.create({
     timeout: 5000,
 });
 client.interceptors.request.use(config => {
+    const apiKey = loadLocalObject(LOCAL_SETTINGS, SettingsKey.Apikey);
     config.headers.Authorization =
-        localStorage.getItem(LOCAL_CLIST_APIKEY) || process.env.REACT_APP_CLIST_API_AUTH;
+        apiKey || process.env.REACT_APP_CLIST_API_AUTH;
     return config;
 });
 client.interceptors.response.use(data => data, (error: AxiosError) => {

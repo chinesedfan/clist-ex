@@ -3,7 +3,7 @@ import Contest from "../types/Contest";
 import Statistics from "../types/Statistics";
 import { getAlignedOffset } from "../utils/pagination";
 import { loadAllData, openDatabase, saveData } from "./db";
-import { LOCAL_LEETCODE_COOKIE, LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, isCacheExpired, touchCache } from "./localstorage";
+import { LOCAL_SETTINGS, SettingsKey, StatisticsStrategy, isCacheExpired, loadLocalObject, touchCache } from "./localstorage";
 import { log } from "../utils/log";
 import { notification } from "antd";
 import { fetchLeetCodeProblems, LCRawProblem } from "../apis/leetcode";
@@ -107,7 +107,7 @@ export async function loadStatistics(account_id: number, contestIds: number[]) {
     });
     // TODO: handle bad db?
 
-    const strategy = localStorage.getItem(LOCAL_STATISTICS_STRATEGY) || StatisticsStrategy.CacheFirstIfNonEmpty;
+    const strategy = loadLocalObject(LOCAL_SETTINGS)[SettingsKey.StatisticsStrategy];
     const statisticsMap: Record<number, Statistics> = {}
 
     const cacheContestIds: number[] = [];
@@ -153,10 +153,16 @@ export async function loadStatistics(account_id: number, contestIds: number[]) {
 
 export async function loadLeetCodeProblems() {
     const storeName = 'lc-problems';
-    const cookie = localStorage.getItem(LOCAL_LEETCODE_COOKIE) || '';
-    if (!cookie) return [];
+    const settings = loadLocalObject(LOCAL_SETTINGS);
+    const userName = settings?.[SettingsKey.LeetCodeUserName];
+    const session = settings?.[SettingsKey.LeetCodeSession];
+    if (!userName || !session) {
+        notification.warning({
+            message: 'Please set LeetCode username and session in Settings page first.',
+        });
+        return [];
+    }
 
-    const userName = cookie.split('=').slice(-1)[0];
     const db = await openDatabase(`leetcode-${userName}`, async (db) => {
         await createObjectStorePromise(db, storeName, {
             keyPath: 'questionFrontendId',

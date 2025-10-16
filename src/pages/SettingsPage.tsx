@@ -1,7 +1,7 @@
 import { Button, Flex, Input, Radio, RadioChangeEvent, Space, Typography, notification } from "antd";
 import { useCallback, useState } from "react";
 import { STORE_CC, STORE_LC } from "../services";
-import { LOCAL_CLIST_APIKEY, LOCAL_LEETCODE_COOKIE, LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, useLocalStorage } from "../services/localstorage";
+import { defaultSettings, LOCAL_SETTINGS, SettingsKey, StatisticsStrategy, useLocalStorage } from "../services/localstorage";
 
 const { Title } = Typography;
 
@@ -12,23 +12,28 @@ const strategyRadioItems = [
 ];
 
 export const SettingsPage: React.FC<any> = (props) => {
-    const [apiKey, setAPIKey] = useState(localStorage.getItem(LOCAL_CLIST_APIKEY) || '');
-    const [leetcodeCookie, setLeetCodeCookie] = useState(localStorage.getItem(LOCAL_LEETCODE_COOKIE) || '');
-    const [strategy, setStrategy] = useLocalStorage(LOCAL_STATISTICS_STRATEGY, StatisticsStrategy.CacheFirstIfNonEmpty, {
-        raw: true,
-    });
+    const [settings, setSettings] = useLocalStorage<Record<string, any> >(LOCAL_SETTINGS, defaultSettings);
+
+    const [apiKey, setAPIKey] = useState(settings![SettingsKey.Apikey] || '');
+    const [leetcodeUserName, setLeetCodeUserName] = useState(settings![SettingsKey.LeetCodeUserName] || '');
+    const [leetcodeSession, setLeetCodeSession] = useState(settings![SettingsKey.LeetCodeSession] || '');
+
     const onBtnSaveKeyClicked = useCallback(() => {
-        localStorage.setItem(LOCAL_CLIST_APIKEY, apiKey);
+        setSettings((prev) => ({ ...prev, [SettingsKey.Apikey]: apiKey }));
         notification.info({
-            message: `Save ${LOCAL_CLIST_APIKEY} in local storage.`,
+            message: `Save ${SettingsKey.Apikey} in local storage.`,
         });
-    }, [apiKey]);
+    }, [apiKey, settings]);
     const onBtnSaveCookieClicked = useCallback(() => {
-        localStorage.setItem(LOCAL_LEETCODE_COOKIE, leetcodeCookie);
+        setSettings((prev) => ({
+            ...prev,
+            [SettingsKey.LeetCodeUserName]: leetcodeUserName,
+            [SettingsKey.LeetCodeSession]: leetcodeSession,
+        }));
         notification.info({
-            message: `Save ${LOCAL_LEETCODE_COOKIE} in local storage.`,
+            message: `Save ${SettingsKey.LeetCodeSession} in local storage.`,
         });
-    }, [leetcodeCookie]);
+    }, [leetcodeUserName, leetcodeSession, settings]);
     const onBtnResetLockClicked = useCallback((storeName: string) => {
         localStorage.removeItem(storeName);
         notification.info({
@@ -36,11 +41,11 @@ export const SettingsPage: React.FC<any> = (props) => {
         });
     }, []);
     const onStrategyRadioChange = useCallback((e: RadioChangeEvent) => {
-        setStrategy(e.target.value);
+        setSettings((prev) => ({ ...prev, [SettingsKey.StatisticsStrategy]: e.target.value }));
         notification.info({
-            message: `Save ${LOCAL_STATISTICS_STRATEGY} in local storage.`,
+            message: `Save ${SettingsKey.StatisticsStrategy} in local storage.`,
         });
-    }, []);
+    }, [settings]);
 
     return (<>
         <Title level={3}>API Key</Title>
@@ -50,9 +55,10 @@ export const SettingsPage: React.FC<any> = (props) => {
             <Button type="primary" onClick={onBtnSaveKeyClicked}>Save</Button>
         </Space.Compact>
         <Title level={3}>LeetCode Cookie</Title>
-        <p>Set your LeetCode cookie LEETCODE_SESSION to load accurate problem status from official websites, instead of clist.</p>
-        <Flex>
-            <Input.TextArea placeholder={'1. open leetcode.com/cn in browser.\n2. find cookie LEETCODE_SESSION in Application->Cookies.\n3. copy and paste here.'} defaultValue={leetcodeCookie} onChange={(e) => setLeetCodeCookie(e.currentTarget.value)} rows={4} style={{ resize: 'none', width: '527px', marginRight: '10px' }}></Input.TextArea>
+        <p>Set your LeetCode username and LEETCODE_SESSION cookie to load accurate problem status from official websites, instead of clist.</p>
+        <Input placeholder="LeetCode UserName" defaultValue={leetcodeUserName} onChange={(e) => setLeetCodeUserName(e.currentTarget.value)} style={{ width: '527px', marginBottom: '10px' }}></Input>
+        <Flex align="end">
+            <Input.TextArea placeholder={'LeetCode Session\n1. open leetcode.com/cn in browser.\n2. find cookie LEETCODE_SESSION in Application -> Cookies.\n3. copy and paste here.'} defaultValue={leetcodeSession} onChange={(e) => setLeetCodeSession(e.currentTarget.value)} rows={5} style={{ resize: 'none', width: '527px', marginRight: '10px' }}></Input.TextArea>
             <Button type="primary" onClick={onBtnSaveCookieClicked}>Save</Button>
         </Flex>
         <Title level={3}>Contests Cache</Title>
@@ -63,7 +69,7 @@ export const SettingsPage: React.FC<any> = (props) => {
         </Flex>
         <Title level={3}>Statistics Cache</Title>
         <p>Switch different cache strategies for contest statistics data.</p>
-        <Radio.Group defaultValue={strategy} onChange={onStrategyRadioChange}>
+        <Radio.Group defaultValue={settings![SettingsKey.StatisticsStrategy]} onChange={onStrategyRadioChange}>
             { strategyRadioItems.map(item => (
                 <Radio.Button value={item.value} key={item.value}>{item.label}</Radio.Button>
             ))}

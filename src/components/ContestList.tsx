@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Table, TablePaginationConfig } from 'antd';
 import '../styles/contest-list.scss';
 import { loadContestList, loadStatistics } from '../services';
-import { LOCAL_STATISTICS_STRATEGY, StatisticsStrategy, useLocalStorage } from '../services/localstorage';
+import { defaultSettings, LOCAL_SETTINGS, SettingsKey, StatisticsStrategy, useLocalStorage } from '../services/localstorage';
 import Account from '../types/Account';
 import { ContestItem } from './ContestItem';
 import { ProblemItem } from './ProblemItem';
@@ -42,9 +42,7 @@ export const ContestList: React.FC<Props> = (props) => {
         showQuickJumper: true,
     });
     const [loading, setLoading] = useState(false);
-    const [strategy, setStrategy] = useLocalStorage(LOCAL_STATISTICS_STRATEGY, StatisticsStrategy.CacheFirstIfNonEmpty, {
-        raw: true,
-    });
+    const [settings, setSettings] = useLocalStorage<Record<string, any> >(LOCAL_SETTINGS, defaultSettings);
 
     async function updateContestsData() {
         const contests = await loadContestList(resource);
@@ -100,9 +98,16 @@ export const ContestList: React.FC<Props> = (props) => {
 
         (async function() {
             setLoading(true);
-            setStrategy(StatisticsStrategy.NetworkFirst);
+            const strategy = settings![SettingsKey.StatisticsStrategy];
+            setSettings(prev => ({
+                ...prev,
+                [SettingsKey.StatisticsStrategy]: StatisticsStrategy.NetworkFirst,
+            }));
             await updateStatistics(pagination);
-            setStrategy(strategy);
+            setSettings(prev => ({
+                ...prev,
+                [SettingsKey.StatisticsStrategy]: strategy
+            }));
             setPagination(pagination);
             setLoading(false);
         })();
