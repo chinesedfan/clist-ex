@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "antd": "^5.15.0",
+    "antd": "^5.23.0",
     "axios": "^1.6.7",
     "leetcode-query": "^2.0.1",
     "react": "^18.2.0",
