@@ -6,7 +6,7 @@ import { loadAllData, openDatabase, saveData } from "./db";
 import { LOCAL_SETTINGS, SettingsKey, StatisticsStrategy, isCacheExpired, loadLocalObject, touchCache } from "./localstorage";
 import { log } from "../utils/log";
 import { notification } from "antd";
-import { fetchLeetCodeProblems, LCRawProblem } from "../apis/leetcode";
+import { fetchLeetCodeProblems, fetchLeetCodeProblemsFromSupabase, LCRawProblem } from "../apis/leetcode";
 
 const PAGE_SIZE = 200;
 const DB_NAME = 'clist-ex';
@@ -154,16 +154,22 @@ export async function loadStatistics(account_id: number, contestIds: number[]) {
 export async function loadLeetCodeProblems() {
     const storeName = 'lc-problems';
     const settings = loadLocalObject(LOCAL_SETTINGS);
-    const userName = settings?.[SettingsKey.LeetCodeUserName];
+    const supabaseUrl = settings?.[SettingsKey.SupabaseUrl]
+        || 'https://cfrpqzgicycalnxmbqxa.supabase.co';
+    const supabaseAnonKey = settings?.[SettingsKey.SupabaseAnonKey]
+        || 'sb_publishable_fwbwKhD8pcHBy0Ugf4bY8w_Kc0NQUwL';
+    const useSupabase = true
+    const userName = settings?.[SettingsKey.LeetCodeUserName] || 'chinesedfan';
     const session = settings?.[SettingsKey.LeetCodeSession];
-    if (!userName || !session) {
+    if (!userName) {
         notification.warning({
             message: 'Please set LeetCode username and session in Settings page first.',
         });
         return [];
     }
 
-    const db = await openDatabase(`leetcode-${userName}`, async (db) => {
+    const dbKey = `leetcode-${userName}`
+    const db = await openDatabase(dbKey, async (db) => {
         await createObjectStorePromise(db, storeName, {
             keyPath: 'questionFrontendId',
         });
@@ -173,7 +179,10 @@ export async function loadLeetCodeProblems() {
         return cacheProblems;
     }
 
-    const fetchedProblems = await fetchLeetCodeProblems();
+    const fetchedProblems = useSupabase
+        ? await fetchLeetCodeProblemsFromSupabase({ url: supabaseUrl, anonKey: supabaseAnonKey })
+        : await fetchLeetCodeProblems();
+
     for (const p of fetchedProblems) {
         saveData(db, storeName, p);
     }

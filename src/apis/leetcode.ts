@@ -8,6 +8,9 @@ const DELAY_MS = 1500;
 // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 const GITHUB_DATA_URL = 'https://raw.githubusercontent.com/zerotrac/leetcode_problem_rating/main/data.json';
 
+// Supabase REST API page size (max 1000 per request)
+const SUPABASE_PAGE_SIZE = 1000;
+
 export type LCRawProblem = ProblemList['questions'][0];
 export interface LCRawRating {
     Rating: number;
@@ -19,6 +22,103 @@ export interface LCRawRating {
     ProblemIndex: string;
     ContestID_en: string;
     ContestID_zh: string;
+}
+
+export interface SupabaseConfig {
+    url: string;
+    anonKey: string;
+}
+
+/**
+ * Fetch all LeetCode problems from a Supabase table named `leetcode_problems`.
+ *
+ * Supabase REST API supports CORS natively — no proxy needed.
+ * Authentication is done via the public `anon` key passed as a query param
+ * (or header), so no cookies / credentials are required.
+ *
+ * Table DDL (run once in Supabase SQL Editor):
+ *
+ *   CREATE TABLE leetcode_problems (
+ *     "questionFrontendId" TEXT PRIMARY KEY,
+ *     "acRate"             DOUBLE PRECISION,
+ *     "difficulty"         TEXT,
+ *     "freqBar"            DOUBLE PRECISION,
+ *     "isFavor"            BOOLEAN,
+ *     "isPaidOnly"         BOOLEAN,
+ *     "status"             TEXT,
+ *     "title"              TEXT,
+ *     "titleSlug"          TEXT,
+ *     "hasSolution"        BOOLEAN,
+ *     "hasVideoSolution"   BOOLEAN,
+ *     "topicTags"          JSONB
+ *   );
+ *
+ *   ALTER TABLE leetcode_problems ENABLE ROW LEVEL SECURITY;
+ *   CREATE POLICY "Allow public read" ON leetcode_problems FOR SELECT USING (true);
+ */
+export async function fetchLeetCodeProblemsFromSupabase(
+    config: SupabaseConfig
+): Promise<LCRawProblem[]> {
+    const { url, anonKey } = config;
+    // Normalise: strip trailing slash
+    const base = url.replace(/\/$/, '');
+    const endpoint = `${base}/rest/v1/leetcode_problems_progress`;
+
+    const headers: Record<string, string> = {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+        Accept: 'application/json',
+        // Ask PostgREST to return the total row count in the Content-Range header
+        Prefer: 'count=exact',
+    };
+
+    const all: LCRawProblem[] = [];
+    let offset = 0;
+    let total: number | null = null;
+
+    while (true) {
+        const rangeEnd = offset + SUPABASE_PAGE_SIZE - 1;
+        const res = await fetch(
+            `${endpoint}?select=*&order=questionFrontendId.asc&offset=${offset}&limit=${SUPABASE_PAGE_SIZE}`,
+            {
+                method: 'GET',
+                headers: {
+                    ...headers,
+                    // PostgREST range header for pagination
+                    Range: `${offset}-${rangeEnd}`,
+                },
+            }
+        );
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Supabase request failed (${res.status}): ${text}`);
+        }
+
+        // Parse total count from Content-Range: 0-999/3456
+        if (total === null) {
+            const contentRange = res.headers.get('Content-Range');
+            if (contentRange) {
+                const match = contentRange.match(/\/(\d+)$/);
+                if (match) total = parseInt(match[1], 10);
+            }
+        }
+
+        const page: LCRawProblem[] = await res.json();
+        all.push(...page);
+
+        notification.info({
+            message: `...${all.length}${total !== null ? `/${total}` : ''} problems fetched from Supabase.`,
+        });
+
+        if (page.length < SUPABASE_PAGE_SIZE) break;
+        if (total !== null && all.length >= total) break;
+
+        offset += SUPABASE_PAGE_SIZE;
+    }
+
+    log(`[supabase] fetchLeetCodeProblemsFromSupabase: total=${all.length}`);
+    return all;
 }
 
 export async function fetchLeetCodeProblems() {

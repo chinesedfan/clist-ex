@@ -11,6 +11,8 @@ export enum SettingsKey {
     StatisticsStrategy = 'statistics-strategy',
     LeetCodeUserName = 'leetcode-username',
     LeetCodeSession = 'leetcode-session',
+    SupabaseUrl = 'supabase-url',
+    SupabaseAnonKey = 'supabase-anon-key',
 }
 
 export enum StatisticsStrategy {
