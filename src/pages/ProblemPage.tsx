@@ -31,7 +31,7 @@ export const ProblemPage: React.FC = () => {
                 return map;
             }, {} as Record<string, number>); 
 
-            const currentData = defaultData
+            const currentData = defaultData.map(o => ({ ...o }))
             const problems = await loadLeetCodeProblems();
             let unknownCount = 0;
             problems.forEach(p => {

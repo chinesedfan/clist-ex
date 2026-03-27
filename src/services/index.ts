@@ -168,27 +168,27 @@ export async function loadLeetCodeProblems() {
         return [];
     }
 
-    const dbKey = `leetcode-${userName}`
-    const db = await openDatabase(dbKey, async (db) => {
-        await createObjectStorePromise(db, storeName, {
-            keyPath: 'questionFrontendId',
-        });
-    });
-    if (!isCacheExpired(storeName)) {
-        const cacheProblems = await loadAllData<LCRawProblem[]>(db, storeName);
-        return cacheProblems;
-    }
+    // const dbKey = `leetcode-${userName}`
+    // const db = await openDatabase(dbKey, async (db) => {
+    //     await createObjectStorePromise(db, storeName, {
+    //         keyPath: 'questionFrontendId',
+    //     });
+    // });
+    // if (!isCacheExpired(storeName)) {
+    //     const cacheProblems = await loadAllData<LCRawProblem[]>(db, storeName);
+    //     return cacheProblems;
+    // }
 
     const fetchedProblems = useSupabase
         ? await fetchLeetCodeProblemsFromSupabase({ url: supabaseUrl, anonKey: supabaseAnonKey })
         : await fetchLeetCodeProblems();
 
-    for (const p of fetchedProblems) {
-        saveData(db, storeName, p);
-    }
-    if (fetchedProblems.length) {
-        touchCache(storeName);
-    }
+    // for (const p of fetchedProblems) {
+    //     saveData(db, storeName, p);
+    // }
+    // if (fetchedProblems.length) {
+    //     touchCache(storeName);
+    // }
     log(`[service] loadLeetCodeProblems: fetchedCount=${fetchedProblems.length}.`);
     return fetchedProblems;
 }
