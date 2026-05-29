@@ -8,6 +8,8 @@
 # testing
 /coverage
 /src/mock
+/scripts/problems.json
+/scripts/pbstatus.json
 
 # production
 /build

@@ -26,8 +26,8 @@ REACT_APP_CLIST_API_AUTH="ApiKey xxx"
 
 1. For page Contests, all is loaded from clist.
 2. For page Problems, it includes 2 parts. Both of them have CORS problem, so you need install some browser extensions, i.e. [ModHeader](https://modheader.com/docs/modheader) to mock response headers at the first time.
-    - ratings: [zerotrac/leetcode_problem_rating](https://github.com/zerotrac/leetcode_problem_rating).
-    - solved status: unofficial LeetCode GraphQL API by [JacobLinCool/LeetCode-Query](https://github.com/JacobLinCool/LeetCode-Query).
+    - ratings: [zerotrac/leetcode_problem_rating](https://github.com/zerotrac/leetcode_problem_rating). Bypassed by jsonp now.
+    - solved status: ~~unofficial LeetCode GraphQL API by [JacobLinCool/LeetCode-Query](https://github.com/JacobLinCool/LeetCode-Query)~~. Replaced by supabase API with offline data.
 
 ## Cache
 
